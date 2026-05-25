@@ -10,6 +10,8 @@
     startScreen: document.getElementById("start-screen"),
     betScreen: document.getElementById("bet-screen"),
     betCountdown: document.getElementById("bet-countdown"),
+    introSummary: document.getElementById("intro-summary"),
+    introSkipBtn: document.getElementById("intro-skip-btn"),
     thanosScreen: document.getElementById("thanos-screen"),
     tenFightScreen: document.getElementById("ten-fight-screen"),
     tenFightTitle: document.getElementById("ten-fight-title"),
@@ -95,6 +97,7 @@
       document.getElementById("next-odds-paper"),
     ],
     presetButtons: [...document.querySelectorAll("[data-preset]")],
+    countStepButtons: [...document.querySelectorAll("[data-count-step]")],
     themeButtons: [...document.querySelectorAll("[data-theme]")],
     setupSummaries: [...document.querySelectorAll("[data-setup-summary]")],
   };
@@ -894,8 +897,17 @@
     updateSetupSummaries();
   }
 
+  function stepCountInput(input, step) {
+    if (!input) return;
+    const min = parseInt(input.min, 10) || 3;
+    const max = parseInt(input.max, 10) || 60;
+    const current = clamp(parseInt(input.value, 10) || 10, min, max);
+    input.value = String(clamp(current + step, min, max));
+    syncCountInput(input);
+  }
+
   function presetCount() {
-    return window.matchMedia("(max-width: 560px)").matches ? 10 : 30;
+    return window.matchMedia("(max-width: 560px)").matches ? 7 : 30;
   }
 
   function setCounts(value) {
@@ -1112,6 +1124,46 @@
     ui.inputs.liveNotifications.checked = state.settings.notifications;
   }
 
+  function enabledOptionLabels() {
+    return [
+      [state.options.godHand, "上帝之手"],
+      [state.options.obstacles, "地形障碍"],
+      [state.options.shrink, "缩圈"],
+      [state.options.bounty, "悬赏头名"],
+      [state.options.traitor, "我们中出了个叛徒"],
+      [state.options.blackHole, "黑洞"],
+      [state.options.powerups, "能量道具"],
+      [state.options.tenFight, "我要打十个"],
+      [state.options.lastStand, "绝地求生"],
+      [state.options.thanos, "灭霸响指"],
+      [state.options.zones, "据点争夺"],
+      [state.options.tournament, `多局 ${state.bestOf}局`],
+      [state.options.betting, `竞猜 ${state.stake}`],
+    ]
+      .filter(([enabled]) => enabled)
+      .map(([, label]) => label);
+  }
+
+  function renderIntroSummary() {
+    const countText = state.baseCounts
+      .map((count, type) => `${TYPE_INFO[type].emoji}${count}`)
+      .join(" ");
+    const durationText = state.options.deathmatch
+      ? "死斗模式"
+      : `${Math.round(state.roundLimit / 1000)}秒`;
+    const items = [
+      `阵容 ${countText}`,
+      durationText,
+      `支持 ${TYPE_INFO[state.prediction].emoji}${TYPE_INFO[state.prediction].label}`,
+      ...enabledOptionLabels(),
+    ];
+    ui.introSummary.replaceChildren(...items.map((text) => {
+      const chip = document.createElement("span");
+      chip.textContent = text;
+      return chip;
+    }));
+  }
+
   async function startTournament() {
     await audio.init();
     audio.startBgm();
@@ -1125,6 +1177,7 @@
   }
 
   function beginTournament() {
+    clearCountdownTimers();
     ui.startScreen.classList.add("hidden");
     ui.betScreen.classList.add("hidden");
     ui.resultScreen.classList.add("hidden");
@@ -1137,6 +1190,7 @@
     ui.resultScreen.classList.add("hidden");
     ui.betScreen.classList.remove("hidden");
     syncPredictionButtons();
+    renderIntroSummary();
     startBetCountdown();
   }
 
@@ -1365,6 +1419,9 @@
   function setPrediction(type) {
     state.prediction = type;
     syncPredictionButtons();
+    if (!ui.betScreen.classList.contains("hidden")) {
+      renderIntroSummary();
+    }
   }
 
   function syncPredictionButtons() {
@@ -3322,6 +3379,7 @@
   });
 
   ui.startBtn.addEventListener("click", startTournament);
+  ui.introSkipBtn.addEventListener("click", beginTournament);
   ui.homeBtn.addEventListener("click", showStartScreen);
   ui.restartBtn.addEventListener("click", showStartScreen);
 
@@ -3359,6 +3417,13 @@
   ui.presetButtons.forEach((button) => {
     button.addEventListener("click", () => {
       applyPreset(button.dataset.preset);
+    });
+  });
+
+  ui.countStepButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = document.getElementById(button.dataset.countTarget);
+      stepCountInput(input, parseInt(button.dataset.countStep, 10) || 0);
     });
   });
 

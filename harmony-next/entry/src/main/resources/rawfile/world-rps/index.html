@@ -98,7 +98,10 @@
 
         <section class="preset-panel" aria-label="游戏预设">
           <div class="preset-head">
-            <strong>游戏预设</strong>
+            <strong>
+              <span class="preset-title-desktop">游戏预设</span>
+              <span class="preset-title-mobile">经典战役</span>
+            </strong>
             <span>一键套用经典玩法</span>
           </div>
           <div class="preset-grid">
@@ -158,15 +161,27 @@
             </label>
             <label class="number-row">
               <span><span data-type-emoji="0">🪨</span> <span data-type-label="0">石头</span></span>
-              <input id="cfg-rock" type="number" value="10" min="3" max="60">
+              <div class="count-stepper">
+                <button type="button" data-count-step="-1" data-count-target="cfg-rock" aria-label="减少石头人数">-</button>
+                <input id="cfg-rock" type="number" value="10" min="3" max="60">
+                <button type="button" data-count-step="1" data-count-target="cfg-rock" aria-label="增加石头人数">+</button>
+              </div>
             </label>
             <label class="number-row">
               <span><span data-type-emoji="1">✂️</span> <span data-type-label="1">剪刀</span></span>
-              <input id="cfg-scissors" type="number" value="10" min="3" max="60">
+              <div class="count-stepper">
+                <button type="button" data-count-step="-1" data-count-target="cfg-scissors" aria-label="减少剪刀人数">-</button>
+                <input id="cfg-scissors" type="number" value="10" min="3" max="60">
+                <button type="button" data-count-step="1" data-count-target="cfg-scissors" aria-label="增加剪刀人数">+</button>
+              </div>
             </label>
             <label class="number-row">
               <span><span data-type-emoji="2">✋🏻</span> <span data-type-label="2">布</span></span>
-              <input id="cfg-paper" type="number" value="10" min="3" max="60">
+              <div class="count-stepper">
+                <button type="button" data-count-step="-1" data-count-target="cfg-paper" aria-label="减少布人数">-</button>
+                <input id="cfg-paper" type="number" value="10" min="3" max="60">
+                <button type="button" data-count-step="1" data-count-target="cfg-paper" aria-label="增加布人数">+</button>
+              </div>
             </label>
             <label class="number-row">
               <span>单局秒数</span>
@@ -363,7 +378,9 @@
           </fieldset>
         </div>
 
-        <button id="start-btn" class="primary-btn" type="button">开始乱斗</button>
+        <div class="setup-actions">
+          <button id="start-btn" class="primary-btn" type="button">开始乱斗</button>
+        </div>
       </div>
     </section>
 
@@ -385,7 +402,9 @@
             <strong data-type-label="2">布</strong>
           </button>
         </div>
+        <div id="intro-summary" class="intro-summary" aria-label="本局设置"></div>
         <div id="bet-countdown" class="bet-countdown">3</div>
+        <button id="intro-skip-btn" class="secondary-btn intro-skip-btn" type="button">直接开始</button>
       </div>
     </section>
 
