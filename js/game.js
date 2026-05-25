@@ -617,7 +617,6 @@
     root.style.setProperty("--rock", TYPE_INFO[0].color);
     root.style.setProperty("--scissors", TYPE_INFO[1].color);
     root.style.setProperty("--paper", TYPE_INFO[2].color);
-    ui.brandMark.textContent = theme.mark;
     ui.brandSubtitle.textContent = theme.subtitle;
     ui.themeButtons.forEach((button) => {
       button.classList.toggle("active", button.dataset.theme === key);

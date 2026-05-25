@@ -391,16 +391,12 @@ button {
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
-  width: 72px;
-  height: 72px;
+  display: block;
+  width: 86px;
+  height: 86px;
   flex: 0 0 auto;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(217, 92, 71, 0.12), rgba(44, 143, 127, 0.13));
-  font-size: 27px;
-  letter-spacing: -7px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(23, 32, 28, 0.18));
 }
 
 h1,
@@ -1181,9 +1177,8 @@ h1 {
   }
 
   .brand-mark {
-    width: 50px;
-    height: 50px;
-    font-size: 19px;
+    width: 58px;
+    height: 58px;
   }
 
   h1 {
