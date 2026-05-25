@@ -146,13 +146,32 @@
 
   const TYPE_INFO = THEMES.rps.types.map((item) => ({ ...item }));
 
+  const GAMEPLAY_OPTION_KEYS = [
+    "betting",
+    "tournament",
+    "deathmatch",
+    "zones",
+    "godHand",
+    "obstacles",
+    "shrink",
+    "bounty",
+    "traitor",
+    "blackHole",
+    "powerups",
+    "tenFight",
+    "lastStand",
+    "thanos",
+  ];
+
   const PRESETS = {
     classic: {
+      groups: ["format"],
       options: {
         deathmatch: true,
       },
     },
     zones: {
+      groups: ["events", "format"],
       options: {
         zones: true,
         blackHole: true,
@@ -160,6 +179,7 @@
       },
     },
     traitor: {
+      groups: ["mechanics", "events", "format"],
       options: {
         deathmatch: true,
         shrink: true,
@@ -168,6 +188,7 @@
       },
     },
     equality: {
+      groups: ["mechanics", "events", "format"],
       options: {
         deathmatch: true,
         obstacles: true,
@@ -884,24 +905,51 @@
     });
   }
 
+  function gameplayInputs() {
+    return GAMEPLAY_OPTION_KEYS
+      .map((key) => ui.inputs[key])
+      .filter(Boolean);
+  }
+
+  function setCheckbox(input, checked) {
+    if (!input) return;
+    input.checked = Boolean(checked);
+  }
+
   function clearGameplayOptions() {
-    [
-      ui.inputs.betting,
-      ui.inputs.tournament,
-      ui.inputs.deathmatch,
-      ui.inputs.zones,
-      ui.inputs.godHand,
-      ui.inputs.obstacles,
-      ui.inputs.shrink,
-      ui.inputs.bounty,
-      ui.inputs.traitor,
-      ui.inputs.blackHole,
-      ui.inputs.powerups,
-      ui.inputs.tenFight,
-      ui.inputs.lastStand,
-      ui.inputs.thanos,
-    ].forEach((input) => {
-      input.checked = false;
+    gameplayInputs().forEach((input) => {
+      setCheckbox(input, false);
+    });
+  }
+
+  function applyPresetOptions(preset) {
+    clearGameplayOptions();
+    Object.entries(preset.options).forEach(([option, enabled]) => {
+      setCheckbox(ui.inputs[option], enabled);
+    });
+  }
+
+  function setSetupGroupExpanded(groupKey, expanded) {
+    const group = document.querySelector(`[data-setup-group="${groupKey}"]`);
+    if (!group) return;
+    const toggle = group.querySelector(".setup-toggle");
+    group.classList.toggle("expanded", expanded);
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", String(expanded));
+    }
+  }
+
+  function syncPresetGroups(preset) {
+    const expandedGroups = new Set(preset.groups || []);
+    document.querySelectorAll("[data-setup-group]").forEach((group) => {
+      const groupKey = group.dataset.setupGroup;
+      setSetupGroupExpanded(groupKey, expandedGroups.has(groupKey));
+    });
+  }
+
+  function syncPresetButtonState(key) {
+    ui.presetButtons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.preset === key);
     });
   }
 
@@ -909,15 +957,9 @@
     const preset = PRESETS[key];
     if (!preset) return;
     setCounts(presetCount());
-    clearGameplayOptions();
-    for (const [option, enabled] of Object.entries(preset.options)) {
-      if (ui.inputs[option]) {
-        ui.inputs[option].checked = enabled;
-      }
-    }
-    ui.presetButtons.forEach((button) => {
-      button.classList.toggle("active", button.dataset.preset === key);
-    });
+    applyPresetOptions(preset);
+    syncPresetGroups(preset);
+    syncPresetButtonState(key);
     syncOptionsFromInputs();
     updateOddsFromInputs();
   }
@@ -3371,22 +3413,7 @@
     });
   });
 
-  [
-    ui.inputs.betting,
-    ui.inputs.tournament,
-    ui.inputs.deathmatch,
-    ui.inputs.zones,
-    ui.inputs.godHand,
-    ui.inputs.obstacles,
-    ui.inputs.shrink,
-    ui.inputs.bounty,
-    ui.inputs.traitor,
-    ui.inputs.blackHole,
-    ui.inputs.powerups,
-    ui.inputs.tenFight,
-    ui.inputs.lastStand,
-    ui.inputs.thanos,
-  ].forEach((input) => {
+  gameplayInputs().forEach((input) => {
     input.addEventListener("change", () => {
       syncOptionsFromInputs();
       updateOddsFromInputs();
