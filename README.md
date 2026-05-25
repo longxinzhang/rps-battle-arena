@@ -43,3 +43,4 @@ python3 -m http.server 5173
 - `assets/warning-dengdeng.mp3`：黑洞刷新、灭霸登场前 3 秒播放。
 - `assets/warning-diudiu.mp3`：缩圈时播放。
 - `assets/win.mp3`：最终结算时播放。
+- `assets/y2155.mp3`：灭霸响指时播放。
