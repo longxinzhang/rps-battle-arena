@@ -1999,11 +1999,14 @@
     if (maybeTriggerEarlyTraitor(now)) return;
     if (now < state.nextTraitorAt || state.entities.length < 6) return;
     const scheduled = [];
-    const groups = [0, 1, 2].map((type) => state.entities.filter((entity) => (
-      !entity.dead && entity.type === type && !isPendingTraitor(entity)
-    )));
-    for (const members of groups) {
-      if (!members.length) continue;
+    const groups = [0, 1, 2]
+      .map((type) => state.entities.filter((entity) => (
+        !entity.dead && entity.type === type && !isPendingTraitor(entity)
+      )))
+      .filter((members) => members.length > 0);
+    const traitorCount = Math.min(pick([1, 2]), groups.length);
+    shuffleInPlace(groups);
+    for (const members of groups.slice(0, traitorCount)) {
       const entity = pick(members);
       scheduleTraitor(entity, now);
       scheduled.push(TYPE_INFO[entity.type].emoji);
