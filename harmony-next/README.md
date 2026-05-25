@@ -22,6 +22,17 @@ harmony-next/
 2. 选择 HarmonyOS NEXT SDK。
 3. 配置签名后运行 `entry` 模块到手机、平板或模拟器。
 
+也可以直接用本机 DevEco Studio 自带工具链构建：
+
+```bash
+./harmony-next/scripts/build-app.sh
+```
+
+未配置签名时会生成未签名产物：
+
+- `harmony-next/entry/build/default/outputs/default/app/entry-default.hap`
+- `harmony-next/build/outputs/default/harmony-next-default-unsigned.app`
+
 ## 同步 Web 游戏资源
 
 主项目的 Web 游戏更新后，在仓库根目录执行：

@@ -14,8 +14,12 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    const mainWindow = windowStage.getMainWindowSync();
-    mainWindow.setWindowLayoutFullScreen(true);
+    try {
+      const mainWindow = windowStage.getMainWindowSync();
+      mainWindow.setWindowLayoutFullScreen(true);
+    } catch (error) {
+      hilog.warn(DOMAIN, 'WorldOfRPS', 'Failed to enable fullscreen: %{public}s', JSON.stringify(error));
+    }
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'WorldOfRPS', 'Failed to load content: %{public}s', JSON.stringify(err));
