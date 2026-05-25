@@ -91,6 +91,14 @@ World of RPS
 └── README.md
 ```
 
+## 平台移植规范
+
+- 平台工程放在独立目录，避免改动 Web 主入口时破坏线上静态部署。
+- `harmony-next/` 只负责 HarmonyOS NEXT 工程壳、资源声明、ArkTS 入口和打包说明。
+- HarmonyOS 内置网页资源放在 `entry/src/main/resources/rawfile/world-rps/`，通过同步脚本从主项目复制，禁止手动长期分叉维护。
+- 平台适配层只做加载、窗口、生命周期、权限和原生能力桥接；游戏规则仍由主项目模块负责。
+- 每次 Web 玩法变更后都要运行 `node harmony-next/scripts/sync-web-assets.mjs`，再用 DevEco Studio 编译验证。
+
 ## 模块职责和行数预算
 
 | 模块 | 职责 | 目标行数 |
@@ -283,4 +291,3 @@ CSS 拆分可以最后做，因为它容易影响视觉细节。拆完后 `index
 - 重要事件通知不超过 2 行。
 - `README.md` 或本文件已同步更新。
 - 部署后公网资源和本地资源 hash 一致。
-

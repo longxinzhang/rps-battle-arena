@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="灭霸响指">
+  <defs>
+    <radialGradient id="bg" cx="65%" cy="42%" r="72%">
+      <stop offset="0" stop-color="#6c4b8e"/>
+      <stop offset=".42" stop-color="#1f2545"/>
+      <stop offset="1" stop-color="#090a16"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff1a6"/>
+      <stop offset=".28" stop-color="#d7a441"/>
+      <stop offset=".7" stop-color="#7c4f1f"/>
+      <stop offset="1" stop-color="#f2c765"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 1  0 .78 0 0 .64  0 0 .2 0 .2  0 0 0 1 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="900" height="520" fill="url(#bg)"/>
+  <circle cx="168" cy="92" r="88" fill="#a8d8ff" opacity=".52"/>
+  <circle cx="735" cy="118" r="138" fill="#7840bb" opacity=".35"/>
+  <g opacity=".32">
+    <path d="M0 408C150 352 263 359 386 406s256 56 514-33v147H0z" fill="#101525"/>
+    <path d="M0 443c188-51 357-48 514 1 143 44 260 35 386-3v79H0z" fill="#060812"/>
+  </g>
+  <g transform="translate(238 62)">
+    <path d="M132 388c-30-56-34-119-17-172 12-38 36-74 73-90 44-18 91-2 119 34 41 53 38 134 12 203-46 23-111 31-187 25z" fill="#6f518c"/>
+    <ellipse cx="217" cy="108" rx="88" ry="96" fill="#80609f"/>
+    <path d="M141 104c17-64 67-98 119-91 41 6 68 31 81 63-49-28-108-19-200 28z" fill="#a183bc" opacity=".65"/>
+    <path d="M165 126c35 22 73 22 114 0" fill="none" stroke="#392842" stroke-width="8" stroke-linecap="round" opacity=".72"/>
+    <path d="M188 172c22 13 45 13 68 0" fill="none" stroke="#382540" stroke-width="7" stroke-linecap="round"/>
+    <path d="M110 336c82 31 163 31 243 0l-18 96H127z" fill="url(#gold)"/>
+    <path d="M141 339l44 80m121-80l-44 80M117 374h227" stroke="#4d2d15" stroke-width="8" opacity=".45"/>
+  </g>
+  <g transform="translate(586 88)">
+    <path d="M130 331c-38-38-52-94-39-153l33-151c9-34 54-27 49 8l-18 100 27-95c11-32 55-19 47 14l-28 108 42-88c15-30 56-9 42 21l-45 99 48-48c24-23 54 11 31 36l-75 80c-16 17-26 45-30 74z" fill="url(#gold)" stroke="#4b2b12" stroke-width="8"/>
+    <path d="M97 175c43 44 99 62 166 47" fill="none" stroke="#fff0a6" stroke-width="7" opacity=".6"/>
+    <g filter="url(#glow)">
+      <circle cx="162" cy="88" r="16" fill="#ff4b4b"/>
+      <circle cx="202" cy="102" r="15" fill="#42d6ff"/>
+      <circle cx="233" cy="138" r="15" fill="#7cff6b"/>
+      <circle cx="136" cy="152" r="16" fill="#b45cff"/>
+      <circle cx="194" cy="183" r="20" fill="#fff16e"/>
+    </g>
+    <path d="M31 120c64 34 92 67 94 121" fill="none" stroke="#f4d174" stroke-width="9" stroke-linecap="round"/>
+  </g>
+  <g filter="url(#glow)" opacity=".8">
+    <path d="M688 58l12 31 31 12-31 12-12 31-12-31-31-12 31-12z" fill="#fff5ad"/>
+    <path d="M808 214l8 22 22 8-22 8-8 22-8-22-22-8 22-8z" fill="#9be7ff"/>
+    <path d="M83 233l10 26 26 10-26 10-10 26-10-26-26-10 26-10z" fill="#ff8ee3"/>
+  </g>
+  <text x="52" y="474" fill="#fff5cf" font-family="Arial, sans-serif" font-size="52" font-weight="900" letter-spacing="4">SNAP</text>
+</svg>

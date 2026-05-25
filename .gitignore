@@ -1,9 +1,20 @@
 .DS_Store
 ._*
+
+# Local server and tooling
 node_modules/
+npm-debug.log*
 dist/
 build/
 .env
 .env.*
 *.log
 
+# HarmonyOS / DevEco generated files
+**/oh_modules/
+**/.hvigor/
+**/build/
+**/hvigorw
+**/hvigorw.bat
+**/local.properties
+**/.deveco/

@@ -1,0 +1,13 @@
+{
+  "name": "world-of-rps-harmony",
+  "version": "1.0.0",
+  "description": "HarmonyOS NEXT app wrapper for World of RPS.",
+  "main": "",
+  "author": "longxinzhang",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@ohos/hvigor": "5.0.0",
+    "@ohos/hvigor-ohos-plugin": "5.0.0"
+  }
+}

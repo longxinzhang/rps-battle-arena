@@ -14,6 +14,16 @@ python3 -m http.server 5173
 
 然后访问 `http://localhost:5173`。
 
+## HarmonyOS NEXT
+
+鸿蒙 NEXT 工程位于 `harmony-next/`，可用 DevEco Studio 打开并运行到手机、平板或模拟器。当前版本使用 ArkTS + ArkUI 创建应用壳，通过 ArkWeb 加载内置在 rawfile 中的本地游戏资源。
+
+Web 版改动后，同步到鸿蒙工程：
+
+```bash
+node harmony-next/scripts/sync-web-assets.mjs
+```
+
 ## 玩法开关
 
 - 默认只开启基础观战：三方自动追捕、躲避、碰撞转化。
