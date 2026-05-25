@@ -429,6 +429,77 @@ h1 {
   gap: 12px;
 }
 
+.preset-panel {
+  margin: 14px 0 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(248, 250, 247, 0.84);
+}
+
+.preset-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: #26332d;
+}
+
+.preset-head strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.preset-head span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.preset-grid button {
+  min-width: 0;
+  min-height: 58px;
+  border: 1px solid rgba(23, 32, 28, 0.13);
+  border-radius: 8px;
+  background: #fff;
+  color: #27332e;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.preset-grid button strong,
+.preset-grid button span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-grid button strong {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.preset-grid button span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.preset-grid button.active {
+  border-color: rgba(44, 143, 127, 0.52);
+  box-shadow: inset 0 0 0 2px rgba(44, 143, 127, 0.12);
+}
+
 .setup-group {
   min-width: 0;
   margin: 0;
@@ -1000,6 +1071,10 @@ h1 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .preset-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
 }
 
 @media (max-width: 560px) {
@@ -1123,6 +1198,37 @@ h1 {
   .setup-grid {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .preset-panel {
+    margin: 10px 0;
+    padding: 10px;
+  }
+
+  .preset-head {
+    margin-bottom: 8px;
+  }
+
+  .preset-head span {
+    display: none;
+  }
+
+  .preset-grid {
+    gap: 6px;
+  }
+
+  .preset-grid button {
+    min-height: 48px;
+    padding: 7px 8px;
+  }
+
+  .preset-grid button strong {
+    font-size: 12px;
+  }
+
+  .preset-grid button span {
+    margin-top: 3px;
+    font-size: 10px;
   }
 
   .setup-group {

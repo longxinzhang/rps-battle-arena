@@ -94,6 +94,7 @@
       document.getElementById("next-odds-scissors"),
       document.getElementById("next-odds-paper"),
     ],
+    presetButtons: [...document.querySelectorAll("[data-preset]")],
     themeButtons: [...document.querySelectorAll("[data-theme]")],
     setupSummaries: [...document.querySelectorAll("[data-setup-summary]")],
   };
@@ -144,6 +145,36 @@
   };
 
   const TYPE_INFO = THEMES.rps.types.map((item) => ({ ...item }));
+
+  const PRESETS = {
+    classic: {
+      options: {
+        deathmatch: true,
+      },
+    },
+    zones: {
+      options: {
+        zones: true,
+        blackHole: true,
+        lastStand: true,
+      },
+    },
+    traitor: {
+      options: {
+        deathmatch: true,
+        shrink: true,
+        blackHole: true,
+        traitor: true,
+      },
+    },
+    equality: {
+      options: {
+        deathmatch: true,
+        obstacles: true,
+        thanos: true,
+      },
+    },
+  };
 
   const POWER_INFO = {
     speed: { label: "加速", icon: "⚡", color: "#ef9b20" },
@@ -841,6 +872,55 @@
     }
     updateOddsFromInputs();
     updateSetupSummaries();
+  }
+
+  function presetCount() {
+    return window.matchMedia("(max-width: 560px)").matches ? 10 : 30;
+  }
+
+  function setCounts(value) {
+    ui.inputs.syncCounts.checked = true;
+    countInputs().forEach((input) => {
+      input.value = String(value);
+    });
+  }
+
+  function clearGameplayOptions() {
+    [
+      ui.inputs.betting,
+      ui.inputs.tournament,
+      ui.inputs.deathmatch,
+      ui.inputs.zones,
+      ui.inputs.godHand,
+      ui.inputs.obstacles,
+      ui.inputs.shrink,
+      ui.inputs.bounty,
+      ui.inputs.traitor,
+      ui.inputs.blackHole,
+      ui.inputs.powerups,
+      ui.inputs.tenFight,
+      ui.inputs.lastStand,
+      ui.inputs.thanos,
+    ].forEach((input) => {
+      input.checked = false;
+    });
+  }
+
+  function applyPreset(key) {
+    const preset = PRESETS[key];
+    if (!preset) return;
+    setCounts(presetCount());
+    clearGameplayOptions();
+    for (const [option, enabled] of Object.entries(preset.options)) {
+      if (ui.inputs[option]) {
+        ui.inputs[option].checked = enabled;
+      }
+    }
+    ui.presetButtons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.preset === key);
+    });
+    syncOptionsFromInputs();
+    updateOddsFromInputs();
   }
 
   function setupSummary(key, text) {
@@ -3232,6 +3312,12 @@
   ui.themeButtons.forEach((button) => {
     button.addEventListener("click", () => {
       applyTheme(button.dataset.theme);
+    });
+  });
+
+  ui.presetButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      applyPreset(button.dataset.preset);
     });
   });
 
