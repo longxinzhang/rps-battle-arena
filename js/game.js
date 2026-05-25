@@ -181,10 +181,17 @@
   const BOUNTY_SHARE = 0.54;
   const BOUNTY_LEAD = 6;
   const BOUNTY_CHASE_STRENGTH = 0.009;
+  const TRAITOR_EARLY_START = 10000;
+  const TRAITOR_EARLY_END = 15000;
   const TRAITOR_FIRST_DELAY = 20000;
   const TRAITOR_INTERVAL = 10000;
   const TRAITOR_WARNING_DURATION = 2000;
   const TRAITOR_COLOR = "#8b5cf6";
+  const BLACK_HOLE_BASE_RADIUS = 24;
+  const BLACK_HOLE_PULL_RADIUS = 165;
+  const BLACK_HOLE_GROWTH = 1.2;
+  const BLACK_HOLE_MAX_RADIUS = 74;
+  const BLACK_HOLE_MAX_PULL_RADIUS = 360;
   const TEN_FIGHT_DURATION = 10000;
   const TEN_FIGHT_FREEZE = 1600;
   const TEN_FIGHT_TRIGGER_CHANCE = 0.1;
@@ -215,6 +222,7 @@
     nextPowerAt: 0,
     nextTraitorAt: 0,
     nextBlackHoleAt: 0,
+    traitorEarlyUsed: false,
     roundLimit: DEFAULT_ROUND_LIMIT,
     countdownTimer: 0,
     countdownTimers: [],
@@ -1046,6 +1054,7 @@
     state.nextPowerAt = now + rand(2600, 4300);
     state.nextTraitorAt = now + TRAITOR_FIRST_DELAY;
     state.nextBlackHoleAt = now + rand(13500, 18500);
+    state.traitorEarlyUsed = false;
     resetThanosEvent(now);
     resetTenFightEvent(now);
     resetControlZones();
@@ -1987,6 +1996,7 @@
       state.pendingTraitors = [];
       return;
     }
+    if (maybeTriggerEarlyTraitor(now)) return;
     if (now < state.nextTraitorAt || state.entities.length < 6) return;
     const scheduled = [];
     const groups = [0, 1, 2].map((type) => state.entities.filter((entity) => (
@@ -2005,10 +2015,38 @@
     }
   }
 
-  function scheduleTraitor(entity, now) {
+  function maybeTriggerEarlyTraitor(now) {
+    if (state.traitorEarlyUsed) return false;
+    const elapsed = now - state.roundStart;
+    if (elapsed < TRAITOR_EARLY_START) return false;
+    if (elapsed > TRAITOR_EARLY_END) {
+      state.traitorEarlyUsed = true;
+      return false;
+    }
+
+    const counts = countEntities();
+    const aliveTypes = counts
+      .map((count, type) => ({ count, type }))
+      .filter((item) => item.count > 0);
+    if (aliveTypes.length !== 2) return false;
+
+    const candidates = state.entities.filter((entity) => !entity.dead && !isPendingTraitor(entity));
+    if (!candidates.length) return false;
+
+    const entity = pick(candidates);
+    const targetType = pick([0, 1, 2].filter((type) => type !== entity.type));
+    scheduleTraitor(entity, now, { targetType });
+    state.traitorEarlyUsed = true;
+    addEvent(`早期叛徒倒计时：${TYPE_INFO[entity.type].emoji}`, TRAITOR_COLOR);
+    audio.event();
+    return true;
+  }
+
+  function scheduleTraitor(entity, now, options = {}) {
     state.pendingTraitors.push({
       id: entity.id,
       fromType: entity.type,
+      targetType: options.targetType ?? null,
       born: now,
       at: now + TRAITOR_WARNING_DURATION,
     });
@@ -2032,7 +2070,7 @@
         waiting.push(pending);
         continue;
       }
-      messages.push(turnTraitor(entity, now));
+      messages.push(turnTraitor(entity, now, pending.targetType));
     }
     state.pendingTraitors = waiting;
     if (messages.length > 0) {
@@ -2049,9 +2087,11 @@
     return state.pendingTraitors.find((pending) => pending.id === entity.id) || null;
   }
 
-  function turnTraitor(entity, now) {
+  function turnTraitor(entity, now, targetType = null) {
     const oldType = entity.type;
-    entity.type = pick([0, 1, 2].filter((type) => type !== oldType));
+    entity.type = targetType !== null && targetType !== oldType
+      ? targetType
+      : pick([0, 1, 2].filter((type) => type !== oldType));
     entity.lastConverted = now;
     entity.scale = 1.78;
     entity.flash = 1;
@@ -2070,7 +2110,8 @@
       y: point.y,
       vx: Math.cos(angle) * 1.3,
       vy: Math.sin(angle) * 1.3,
-      r: 24,
+      r: BLACK_HOLE_BASE_RADIUS,
+      pullRadius: BLACK_HOLE_PULL_RADIUS,
       born: now,
       life: 8800,
       spin: rand(0, Math.PI * 2),
@@ -2099,8 +2140,9 @@
         const dx = hole.x - entity.x;
         const dy = hole.y - entity.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        if (dist < 165) {
-          const pull = (1 - dist / 165) * 0.035 * dt;
+        const pullRadius = hole.pullRadius || BLACK_HOLE_PULL_RADIUS;
+        if (dist < pullRadius) {
+          const pull = (1 - dist / pullRadius) * 0.035 * dt;
           entity.vx += (dx / dist) * pull;
           entity.vy += (dy / dist) * pull;
         }
@@ -2115,12 +2157,23 @@
           } else {
             entity.dead = true;
             emitBurst(entity.x, entity.y, TYPE_INFO[entity.type].color, 18, 4);
+            growBlackHole(hole, entity);
             audio.void();
           }
         }
       }
     }
     state.blackHoles = state.blackHoles.filter((hole) => now - hole.born < hole.life);
+  }
+
+  function growBlackHole(hole, entity) {
+    hole.r = Math.min(BLACK_HOLE_MAX_RADIUS, hole.r * BLACK_HOLE_GROWTH);
+    hole.pullRadius = Math.min(
+      BLACK_HOLE_MAX_PULL_RADIUS,
+      (hole.pullRadius || BLACK_HOLE_PULL_RADIUS) * BLACK_HOLE_GROWTH,
+    );
+    hole.spin += 0.9;
+    emitBurst(entity.x, entity.y, "#1f1728", 10, 4);
   }
 
   function updatePowerUps(now, dt) {
