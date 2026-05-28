@@ -1,0 +1,108 @@
+.winner-emoji {
+  font-size: 86px;
+  line-height: 1;
+  animation: pop 620ms ease-in-out infinite alternate;
+}
+
+.result-modal h2 {
+  margin-top: 14px;
+  font-size: 31px;
+  letter-spacing: 0;
+}
+
+.next-bet-panel {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(248, 250, 247, 0.86);
+  text-align: left;
+}
+
+.mini-title {
+  margin-bottom: 10px;
+  color: #27332e;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.next-bet-panel .bet-card {
+  height: 62px;
+}
+
+.next-bet-panel .bet-card span {
+  font-size: 22px;
+}
+
+.next-stake-row {
+  min-height: 34px;
+}
+
+.intro-picks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.intro-pick {
+  height: 126px;
+  border: 1px solid rgba(23, 32, 28, 0.13);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.intro-pick span {
+  display: block;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.intro-pick strong {
+  display: block;
+  margin-top: 14px;
+  font-size: 16px;
+}
+
+.intro-pick.active {
+  border-color: rgba(217, 92, 71, 0.55);
+  box-shadow: inset 0 0 0 2px rgba(217, 92, 71, 0.13);
+}
+
+.intro-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 16px;
+}
+
+.intro-summary span {
+  max-width: 100%;
+  padding: 6px 9px;
+  border: 1px solid rgba(23, 32, 28, 0.1);
+  border-radius: 999px;
+  background: rgba(248, 250, 247, 0.88);
+  color: #27332e;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.bet-countdown {
+  display: grid;
+  place-items: center;
+  min-height: 76px;
+  margin-top: 12px;
+  color: #27332e;
+  font-size: 48px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.intro-skip-btn {
+  width: min(180px, 100%);
+}

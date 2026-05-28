@@ -10,14 +10,19 @@
 - 桌面、iPhone、iPad、安卓浏览器都必须作为同等级目标。
 - 部署包应保持静态资源形态，能直接用任意静态服务托管。
 
-## 当前超限文件
+## 当前结构状态
 
-| 文件 | 当前行数 | 问题 | 建议上限 |
+`0.1.0` 已完成 Web 版第一轮模块化重构。当前没有超过 500 行的 Web JS 文件，入口文件只负责装配模块；CSS 已按界面区域拆分。
+
+| 文件 | 当前行数 | 职责 | 建议上限 |
 | --- | ---: | --- | ---: |
-| `js/game.js` | 3285 | 状态、玩法、渲染、音频、UI、部署调试入口混在一起 | 单文件 500 行，模块 80-350 行 |
-| `css/styles.css` | 1183 | 基础布局、首页、HUD、事件层、响应式混在一起 | 单文件 350 行 |
+| `js/game.js` | 406 | 初始化、模块装配、启动应用 | 500 |
+| `js/ui/setup-controller.js` | 341 | 开场设置状态、主题、赔率、设置同步 | 350 |
+| `js/core/round-flow.js` | 294 | 开局、倒计时、单局重置、结算流转 | 350 |
+| `js/render/canvas.js` | 280 | Canvas 绘制调度和非实体层绘制 | 300 |
+| `js/core/combat.js` | 279 | 单位移动、碰撞、转化、悬赏奖励 | 300 |
 
-`index.html` 当前 419 行，可以暂时保留；当 UI 模板继续膨胀时再拆成组件或局部模板。
+`index.html` 当前可以暂时保留；当 UI 模板继续膨胀时再拆成组件或局部模板。
 
 ## 代码组织原则
 
@@ -45,7 +50,7 @@ World of RPS
 │   ├── dock.css
 │   └── responsive.css
 ├── js/
-│   ├── main.js
+│   ├── game.js
 │   ├── config/
 │   │   ├── constants.js
 │   │   └── themes.js
@@ -103,7 +108,7 @@ World of RPS
 
 | 模块 | 职责 | 目标行数 |
 | --- | --- | ---: |
-| `js/main.js` | 初始化、绑定模块、启动应用 | 80-140 |
+| `js/game.js` | 初始化、绑定模块、启动应用 | 300-500 |
 | `config/constants.js` | 尺寸、概率、时间、速度等常量 | 80-160 |
 | `config/themes.js` | RPS、颜色球、国家队、品牌战配置 | 80-180 |
 | `core/state.js` | 创建初始状态、重置局/赛制状态 | 160-260 |
@@ -216,17 +221,14 @@ state.features.traitor = {
 每次改动至少执行：
 
 ```bash
-node --check js/game.js
-python3 -m http.server 5173
+find js -name '*.js' -print0 | xargs -0 -n1 node --check
 ```
 
-如果已经拆成 ES Modules，则改为：
+本项目保持原生 ES Modules，不需要构建工具。需要本地预览时启动静态服务：
 
 ```bash
-node --check js/main.js
+python3 -m http.server 5173
 ```
-
-并逐个检查被修改模块。
 
 涉及 UI 或 Canvas 的改动必须人工或浏览器自动化检查：
 
@@ -273,7 +275,9 @@ node --check js/main.js
 
 - 拆 `core/entities.js`、`core/movement.js`、`core/collisions.js`。
 - 拆 `render/entities.js`、`render/effects.js`、`render/overlays.js`。
-- 最后让 `main.js` 只做装配。
+- 最后让 `game.js` 只做装配。
+
+当前已落地：核心循环、结算、单位查询、粒子、移动碰撞、主要事件、实体绘制、输入绑定已拆成独立模块。后续新增玩法应优先新增 `features/*.js`，不要继续扩大 `js/game.js`。
 
 ### 第 5 步：拆 CSS
 

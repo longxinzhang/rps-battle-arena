@@ -12,21 +12,6 @@
     <canvas id="game" aria-label="World of RPS"></canvas>
 
     <section id="hud" class="hud" aria-live="polite">
-      <div class="scoreboard">
-        <div class="score-pill rock">
-          <span class="score-emoji" data-type-emoji="0">🪨</span>
-          <strong id="s-rock">0</strong>
-        </div>
-        <div class="score-pill scissors">
-          <span class="score-emoji" data-type-emoji="1">✂️</span>
-          <strong id="s-scissors">0</strong>
-        </div>
-        <div class="score-pill paper">
-          <span class="score-emoji" data-type-emoji="2">✋🏻</span>
-          <strong id="s-paper">0</strong>
-        </div>
-      </div>
-
       <div class="round-panel">
         <div class="round-stat">
           <span>局</span>
@@ -43,6 +28,21 @@
         <div class="round-stat">
           <span>积分</span>
           <strong id="bank">1000</strong>
+        </div>
+      </div>
+
+      <div class="scoreboard">
+        <div class="score-pill rock">
+          <span class="score-emoji" data-type-emoji="0">🪨</span>
+          <strong id="s-rock">0</strong>
+        </div>
+        <div class="score-pill scissors">
+          <span class="score-emoji" data-type-emoji="1">✂️</span>
+          <strong id="s-scissors">0</strong>
+        </div>
+        <div class="score-pill paper">
+          <span class="score-emoji" data-type-emoji="2">✋🏻</span>
+          <strong id="s-paper">0</strong>
         </div>
       </div>
     </section>
@@ -410,7 +410,7 @@
 
     <section id="thanos-screen" class="thanos-screen hidden" aria-live="assertive">
       <div class="thanos-card">
-        <img src="assets/thanos-snap.svg" alt="灭霸响指">
+        <img src="assets/thanos.png" alt="灭霸响指">
         <div class="thanos-copy">
           <strong>灭霸响指</strong>
           <span>所有派系消失一半</span>
@@ -459,6 +459,15 @@
     </section>
   </main>
 
-  <script src="js/game.js"></script>
+  <script>
+    window.__rpsErrors = [];
+    window.addEventListener("error", (event) => {
+      window.__rpsErrors.push(`${event.message} @ ${event.filename}:${event.lineno}`);
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+      window.__rpsErrors.push(String(event.reason?.stack || event.reason));
+    });
+  </script>
+  <script type="module" src="js/game.js"></script>
 </body>
 </html>
