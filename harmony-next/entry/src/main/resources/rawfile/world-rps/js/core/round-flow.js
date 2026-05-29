@@ -1,4 +1,9 @@
 import { TRAITOR_FIRST_DELAY } from "../config/constants.js";
+import {
+  getLog,
+  logEvent,
+  resetBattleLog,
+} from "../services/battleLog.js?v=0.2.6";
 
 export function createRoundFlow({
   state,
@@ -28,6 +33,8 @@ export function createRoundFlow({
   getTenFightControls,
   syncPredictionButtons,
   renderIntroSummary,
+  enabledOptionLabels,
+  onGameEnd = () => {},
 }) {
   async function startTournament() {
     audio.init().catch(() => {});
@@ -121,6 +128,18 @@ export function createRoundFlow({
     updateOddsLabels(ui.odds, state.odds);
     updateOddsLabels(ui.nextOdds, state.odds);
     spawnEntities(counts);
+    resetBattleLog();
+    logEvent("game_start", {
+      rockCount: counts[0],
+      scissorsCount: counts[1],
+      paperCount: counts[2],
+      mechanics: enabledOptionLabels(),
+      mode: state.options.deathmatch ? "死斗模式" : `${Math.round(state.roundLimit / 1000)}秒单局`,
+      initialEntities: state.entities.map((entity) => ({
+        id: entity.id,
+        type: entity.type,
+      })),
+    });
     resetLastStandState();
     updateHud();
     cancelAnimationFrame(state.animId);
@@ -170,6 +189,19 @@ export function createRoundFlow({
     }
 
     updateHud(counts);
+    const duration = Number(((performance.now() - state.roundStart) / 1000).toFixed(1));
+    logEvent("game_end", {
+      winnerType,
+      rockCount: counts[0],
+      scissorsCount: counts[1],
+      paperCount: counts[2],
+      duration,
+      reason,
+      mode: state.options.deathmatch ? "死斗模式" : `${Math.round(state.roundLimit / 1000)}秒单局`,
+      aliveEntities: state.entities
+        .filter((entity) => !entity.dead)
+        .map((entity) => ({ id: entity.id, type: entity.type })),
+    });
     const maxWins = Math.ceil(state.bestOf / 2);
     const matchWinner = state.options.tournament
       ? state.wins.findIndex((wins) => wins >= maxWins)
@@ -181,6 +213,17 @@ export function createRoundFlow({
       } else {
         audio.win(winnerType);
       }
+    }
+
+    onGameEnd({
+      winnerType,
+      reason,
+      duration,
+      counts,
+      log: getLog(),
+    });
+    if (state.bettingRoom?.active) {
+      return;
     }
 
     ui.winnerEmoji.textContent = winnerType === null ? "·" : typeInfo[winnerType].emoji;

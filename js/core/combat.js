@@ -7,6 +7,7 @@ import {
   FLEE_STRENGTH,
   FRICTION,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createCombatSystem({
   state,
@@ -27,6 +28,7 @@ export function createCombatSystem({
 }) {
   function updateEntities(now, dt) {
     for (const entity of state.entities) {
+      if (entity.dead) continue;
       const prey = findNearest(entity, tenFightPreyType(entity));
       if (prey) {
         const dx = prey.x - entity.x;
@@ -251,6 +253,12 @@ export function createCombatSystem({
     winner.vy -= ny * loserSide * BASE_SPEED * 0.55;
     emitBurst(loser.x, loser.y, typeInfo[winner.type].color, 8, 3);
     audio.convert(winner.type);
+    logEvent("convert", {
+      winnerId: winner.id,
+      loserId: loser.id,
+      winnerType: winner.type,
+      loserOldType: oldType,
+    });
 
     if (state.options.bounty && state.bounty.active && oldType === state.bounty.leader) {
       applyBountyReward(winner, now);

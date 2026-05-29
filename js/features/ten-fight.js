@@ -6,6 +6,7 @@ import {
   TEN_FIGHT_RATIO,
   TEN_FIGHT_TRIGGER_CHANCE,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createTenFightFeature({
   state,
@@ -115,6 +116,15 @@ export function createTenFightFeature({
       `${candidate.minorityCount} 对 ${candidate.majorityCount}，克制关系即将反转`,
     );
     addEvent(`${info.emoji} 我要打十个触发`, "#f0b429");
+    logEvent("event_trigger", {
+      eventName: "我要打十个",
+      detail: {
+        heroType: candidate.minority,
+        enemyType: candidate.majority,
+        heroCount: candidate.minorityCount,
+        enemyCount: candidate.majorityCount,
+      },
+    });
     audio.warningDengDeng();
   }
 
@@ -128,8 +138,8 @@ export function createTenFightFeature({
         tenFight.endAt = now + TEN_FIGHT_DURATION;
         ui.tenFightScreen.classList.add("hidden");
         updateTenFightBar(TEN_FIGHT_DURATION);
-        addEvent(`${typeInfo[tenFight.minority].emoji} 暴走反杀开始`, "#f0b429");
-        audio.event();
+      addEvent(`${typeInfo[tenFight.minority].emoji} 暴走反杀开始`, "#f0b429");
+      audio.event();
       }
       return;
     }
@@ -167,6 +177,10 @@ export function createTenFightFeature({
     hideTenFightBar();
     if (announce === false) {
       addEvent("打十个结束，克制关系恢复", "#637067");
+      logEvent("event_trigger", {
+        eventName: "我要打十个_失败",
+        detail: { heroType: state.tenFight.minority },
+      });
       audio.event();
     }
   }
@@ -190,6 +204,10 @@ export function createTenFightFeature({
       : { x: state.W / 2, y: state.H / 2 };
     emitBurst(center.x, center.y, "#f0b429", 42, 5.2);
     addEvent("以弱胜强，反杀完成", "#f0b429");
+    logEvent("event_trigger", {
+      eventName: "我要打十个_成功",
+      detail: { heroType: winnerType },
+    });
     finishRound(winnerType, "ten-fight");
   }
 
@@ -228,6 +246,12 @@ export function createTenFightFeature({
     }
 
     target.dead = true;
+    logEvent("kill", {
+      killerId: hero.id,
+      victimId: target.id,
+      killerType: hero.type,
+      victimType: target.type,
+    });
     hero.scale = Math.max(hero.scale, 1.28);
     hero.flash = 1;
     const dx = target.x - hero.x;

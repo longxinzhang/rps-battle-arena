@@ -13,10 +13,16 @@ import { createGameUpdater } from "./core/game-updater.js";
 import { createRoundFlow } from "./core/round-flow.js";
 import { createRoundRules } from "./core/round-rules.js";
 import { createAudioService } from "./services/audio.js";
-import { getDomElements } from "./ui/dom.js";
+import {
+  configureBattleLog,
+  getLog,
+} from "./services/battleLog.js?v=0.2.6";
+import { getDomElements } from "./ui/dom.js?v=0.2.6";
 import { createHudController } from "./ui/hud.js";
 import { createEventFeed } from "./ui/event-feed.js";
 import { createSetupController } from "./ui/setup-controller.js";
+import { createReportPanel } from "./ui/report-panel.js?v=0.2.6";
+import { createBettingRoom } from "./features/betting-room.js?v=0.2.6";
 import { bindPointerControls } from "./ui/pointer-controls.js";
 import { bindInputControls } from "./ui/input-bindings.js";
 import { createCanvasRenderer } from "./render/canvas.js";
@@ -52,6 +58,7 @@ let isTenFightHero = () => false;
 let tenFightPreyType = (entity) => preyType(entity.type);
 let tenFightPredatorType = (entity) => predatorType(entity.type);
 let handleTenFightCollision = () => false;
+let bettingRoom = null;
 
 function draw() {
   renderer?.draw();
@@ -140,8 +147,13 @@ const {
   syncOptionsFromInputs,
   setVolume,
   setNotifications,
+  enabledOptionLabels,
 } = setupController;
 renderIntroSummary = setupController.renderIntroSummary;
+configureBattleLog({ state, countEntities });
+const reportPanel = ui.reportScreen && ui.reportBtn && ui.reportText && ui.reportMvp
+  ? createReportPanel({ ui })
+  : null;
 
 const lastStandFeature = createLastStandFeature({
   state,
@@ -263,6 +275,11 @@ const roundFlow = createRoundFlow({
   getTenFightControls: () => tenFightControls,
   syncPredictionButtons,
   renderIntroSummary,
+  enabledOptionLabels,
+  onGameEnd: (payload) => {
+    state.lastBattleLog = payload.log;
+    bettingRoom?.handleGameEnd(payload);
+  },
 });
 
 const {
@@ -272,6 +289,22 @@ const {
   showStartScreen,
   finishRound,
 } = roundFlow;
+
+if (ui.roomBtn && ui.roomScreen && ui.roomNameInput && ui.roomNameConfirm) {
+  bettingRoom = createBettingRoom({
+    state,
+    ui,
+    audio,
+    applyPreset,
+    readSetup,
+    startRound,
+    showStartScreen,
+    updateOptionVisibility,
+    resize,
+    draw,
+    updateHud,
+  });
+}
 
 const tenFightFeature = createTenFightFeature({
   state,
@@ -398,9 +431,47 @@ updateBank();
 updateOddsFromInputs();
 draw();
 
+function openReportPanel() {
+  if (!reportPanel) {
+    addEvent("战报面板未就绪，请刷新页面", "#d95c47");
+    return;
+  }
+  try {
+    const log = state.lastBattleLog?.length ? state.lastBattleLog : getLog();
+    reportPanel.showReport(log);
+  } catch (error) {
+    window.__rpsErrors?.push(String(error?.stack || error));
+    addEvent("战报生成失败，请重新开一局", "#d95c47");
+  }
+}
+
+function openBettingRoom() {
+  if (!bettingRoom) {
+    addEvent("竞猜房间未就绪，请刷新页面", "#d95c47");
+    return;
+  }
+  bettingRoom.open();
+}
+
+document.addEventListener("click", (event) => {
+  if (event.target.closest("#report-btn")) {
+    event.preventDefault();
+    event.stopPropagation();
+    openReportPanel();
+    return;
+  }
+  if (event.target.closest("#room-btn")) {
+    event.preventDefault();
+    event.stopPropagation();
+    openBettingRoom();
+  }
+}, true);
+
 window.rpsBattle = {
   state,
   startTournament,
   startRound,
   applyTheme,
+  openReportPanel,
+  openBettingRoom,
 };

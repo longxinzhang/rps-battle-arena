@@ -1,4 +1,4 @@
-export const VERSION = "0.1.0";
+export const VERSION = "0.2.6";
 
 export const TYPES = {
   ROCK: 0,
@@ -68,6 +68,11 @@ export const POWER_INFO = {
 
 export const BASE_RADIUS = 17;
 export const BASE_SPEED = 2.25;
+export const ROOM_STAGE_WIDTH = 390;
+export const ROOM_STAGE_HEIGHT = 844;
+export const ROOM_STAGE_COUNT = 7;
+export const ROOM_SNAPSHOT_UPLOAD_MS = 80;
+export const ROOM_STATE_POLL_MS = 120;
 export const CHASE_STRENGTH = 0.014;
 export const FLEE_STRENGTH = 0.01;
 export const FRICTION = 0.992;

@@ -6,6 +6,7 @@ import {
   BLACK_HOLE_MAX_RADIUS,
   BLACK_HOLE_PULL_RADIUS,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createBlackHoleFeature({
   state,
@@ -35,6 +36,10 @@ export function createBlackHoleFeature({
       spin: rand(0, Math.PI * 2),
     });
     state.nextBlackHoleAt = now + rand(19000, 26000);
+    logEvent("event_trigger", {
+      eventName: "黑洞_生成",
+      detail: { x: Math.round(point.x), y: Math.round(point.y) },
+    });
     addEvent("黑洞入场", "#1f1728");
     audio.warningDengDeng();
   }
@@ -64,6 +69,7 @@ export function createBlackHoleFeature({
 
   function consumeNearbyEntities(hole, dt) {
     for (const entity of state.entities) {
+      if (entity.dead) continue;
       const dx = hole.x - entity.x;
       const dy = hole.y - entity.y;
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -90,6 +96,10 @@ export function createBlackHoleFeature({
       return;
     }
     entity.dead = true;
+    logEvent("event_trigger", {
+      eventName: "黑洞_吞噬",
+      detail: { entityId: entity.id, entityType: entity.type },
+    });
     emitBurst(entity.x, entity.y, typeInfo[entity.type].color, 18, 4);
     growBlackHole(hole, entity);
     audio.void();

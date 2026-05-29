@@ -1,6 +1,8 @@
 import {
   BASE_RADIUS,
   BASE_SPEED,
+  ROOM_STAGE_HEIGHT,
+  ROOM_STAGE_WIDTH,
   SHRINK_MIN_ARENA,
 } from "../config/constants.js";
 
@@ -32,8 +34,13 @@ export function createArenaSystem({
     syncViewportHeight();
     const rect = app.getBoundingClientRect();
     state.dpr = window.devicePixelRatio || 1;
-    state.W = Math.round(rect.width || window.innerWidth);
-    state.H = Math.round(rect.height || window.innerHeight);
+    if (state.bettingRoom?.fixedStage) {
+      state.W = ROOM_STAGE_WIDTH;
+      state.H = ROOM_STAGE_HEIGHT;
+    } else {
+      state.W = Math.round(rect.width || window.innerWidth);
+      state.H = Math.round(rect.height || window.innerHeight);
+    }
     canvas.width = Math.floor(state.W * state.dpr);
     canvas.height = Math.floor(state.H * state.dpr);
     ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);

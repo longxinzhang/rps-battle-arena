@@ -6,6 +6,7 @@ import {
   LAST_STAND_SPLIT_CHANCE,
   MAX_ENTITIES,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createLastStandFeature({
   state,
@@ -89,6 +90,10 @@ export function createLastStandFeature({
     state.entities.push(clone);
     resolveArenaCollision(clone);
     emitBurst(entity.x, entity.y, typeInfo[entity.type].color, 18, 3.2);
+    logEvent("event_trigger", {
+      eventName: "绝地求生_分裂",
+      detail: { entityId: entity.id, entityType: entity.type },
+    });
     addEvent(`${typeInfo[entity.type].emoji} 绝地分裂`, typeInfo[entity.type].color);
     audio.pickup("split");
   }
@@ -124,6 +129,10 @@ export function createLastStandFeature({
       state.entities.push(entity);
       resolveArenaCollision(entity);
       emitBurst(entity.x, entity.y, typeInfo[revive.type].color, 26, 4);
+      logEvent("event_trigger", {
+        eventName: "绝地求生_复活",
+        detail: { factionType: revive.type },
+      });
       addEvent(`${typeInfo[revive.type].emoji} 原地复活`, typeInfo[revive.type].color);
       audio.win(revive.type);
     }

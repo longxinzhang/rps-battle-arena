@@ -2,6 +2,7 @@ import {
   SNAP_OVERLAY_DURATION,
   SNAP_REVEAL_DELAY,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createThanosFeature({
   state,
@@ -58,6 +59,7 @@ export function createThanosFeature({
   }
 
   function applyThanosSnap() {
+    const before = countAliveByType();
     for (let type = 0; type < 3; type += 1) {
       const members = state.entities.filter((entity) => !entity.dead && entity.type === type);
       const removeCount = Math.floor(members.length / 2);
@@ -69,8 +71,28 @@ export function createThanosFeature({
       }
     }
     state.entities = state.entities.filter((entity) => !entity.dead);
+    const after = countAliveByType();
+    logEvent("event_trigger", {
+      eventName: "灭霸响指",
+      detail: {
+        rockBefore: before[0],
+        scissorsBefore: before[1],
+        paperBefore: before[2],
+        rockAfter: after[0],
+        scissorsAfter: after[1],
+        paperAfter: after[2],
+      },
+    });
     addEvent("响指完成：所有派系减半", "#f0b429");
     audio.void();
+  }
+
+  function countAliveByType() {
+    const counts = [0, 0, 0];
+    for (const entity of state.entities) {
+      if (!entity.dead) counts[entity.type] += 1;
+    }
+    return counts;
   }
 
   return {

@@ -4,6 +4,7 @@ import {
   SHRINK_INTERVAL,
   SHRINK_STEP,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createShrinkFeature({
   state,
@@ -29,6 +30,10 @@ export function createShrinkFeature({
         state.arena.finalAt = now;
         addEvent("终局压缩完成，准备裁定", "#d95c47");
       }
+      logEvent("event_trigger", {
+        eventName: "缩圈",
+        detail: { newBoundary: Math.round(state.arena.targetPadding) },
+      });
       addEvent("边界收缩", "#2c8f7f");
       audio.warningDiuDiu();
     }

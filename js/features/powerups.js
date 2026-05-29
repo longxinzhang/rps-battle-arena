@@ -3,6 +3,7 @@ import {
   MAX_ENTITIES,
   POWER_INFO,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createPowerUpFeature({
   state,
@@ -57,6 +58,13 @@ export function createPowerUpFeature({
       }
     }
     const info = POWER_INFO[kind];
+    logEvent("event_trigger", {
+      eventName: "道具_拾取",
+      detail: {
+        entityId: entity.id,
+        itemType: powerLogKind(kind),
+      },
+    });
     addEvent(powerUpEventText(entity, kind), info.color);
     emitBurst(entity.x, entity.y, info.color, 16, 3);
     audio.pickup(kind);
@@ -108,6 +116,10 @@ export function createPowerUpFeature({
       return `${prefix} 获得${info.label}，全队尝试分裂`;
     }
     return `${prefix} 获得${info.label}`;
+  }
+
+  function powerLogKind(kind) {
+    return kind.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
   }
 
   return {

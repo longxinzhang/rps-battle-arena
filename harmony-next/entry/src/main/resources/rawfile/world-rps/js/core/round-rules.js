@@ -2,6 +2,7 @@ import {
   CONTROL_ZONE_TARGET,
   SHRINK_FINAL_SETTLE,
 } from "../config/constants.js";
+import { logFactionEliminations } from "../services/battleLog.js?v=0.2.6";
 
 export function createRoundRules({
   state,
@@ -14,6 +15,7 @@ export function createRoundRules({
 }) {
   function updateAndCheckRound(now) {
     const counts = countEntities();
+    logFactionEliminations(counts);
     const aliveTypes = counts
       .map((count, type) => ({ count, type }))
       .filter((item) => item.count > 0);

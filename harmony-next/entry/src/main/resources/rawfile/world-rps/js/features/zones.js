@@ -4,6 +4,7 @@ import {
   CONTROL_ZONE_SCORE_RATE,
   CONTROL_ZONE_TARGET,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createZonesFeature({
   state,
@@ -98,6 +99,10 @@ export function createZonesFeature({
     );
     if (zone.claim >= 1 && zone.owner !== dominant) {
       zone.owner = dominant;
+      logEvent("event_trigger", {
+        eventName: "据点_占领",
+        detail: { pointId: zone.label, factionType: dominant },
+      });
       addEvent(`${typeInfo[dominant].emoji} 占领据点 ${zone.label}`, typeInfo[dominant].color);
       emitBurst(zone.x, zone.y, typeInfo[dominant].color, 20, 4);
       audio.event();

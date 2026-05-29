@@ -380,6 +380,7 @@
 
         <div class="setup-actions">
           <button id="start-btn" class="primary-btn" type="button">开始乱斗</button>
+          <button id="room-btn" class="secondary-btn" type="button" hidden>竞猜房间</button>
         </div>
       </div>
     </section>
@@ -452,11 +453,89 @@
           </label>
         </div>
         <div class="result-actions">
+          <button id="report-btn" class="secondary-btn" type="button">查看战报</button>
           <button id="next-round-btn" class="primary-btn" type="button">下一局</button>
           <button id="restart-btn" class="secondary-btn" type="button">重新开赛</button>
         </div>
       </div>
     </section>
+
+    <section id="report-screen" class="report-screen hidden" aria-label="赛后战报">
+      <div class="report-card">
+        <button id="report-close" class="report-close" type="button" title="关闭">×</button>
+        <div class="report-head">
+          <span>赛后战报</span>
+          <strong>Battle Report</strong>
+        </div>
+        <section class="report-section">
+          <h2>战局叙述</h2>
+          <div id="report-text" class="report-text"></div>
+        </section>
+        <section class="report-section">
+          <h2>人数变化</h2>
+          <canvas id="report-chart" class="report-chart" aria-label="人数变化曲线"></canvas>
+        </section>
+        <section class="report-section">
+          <h2>MVP 统计</h2>
+          <div id="report-mvp" class="report-mvp"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="room-screen" class="room-screen hidden" aria-label="竞猜房间">
+      <div class="room-card">
+        <button id="room-exit" class="room-close" type="button" title="退出">×</button>
+        <div id="room-name-panel" class="room-panel">
+          <div class="room-kicker">竞猜房间</div>
+          <h2>输入昵称进入房间</h2>
+          <p id="room-status" class="room-status">留空房间号会自动创建；输入房间号可加入朋友的房间。</p>
+          <label class="room-name-row">
+            <span>昵称</span>
+            <input id="room-name-input" type="text" maxlength="8" autocomplete="off" placeholder="最多 8 个字">
+          </label>
+          <label class="room-name-row">
+            <span>房间号码</span>
+            <input id="room-code-input" type="text" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="留空自动创建">
+          </label>
+          <button id="room-name-confirm" class="primary-btn" type="button">进入房间</button>
+        </div>
+
+        <div id="room-betting-panel" class="room-panel hidden">
+          <div class="room-kicker" id="room-countdown">下注时间：10 秒</div>
+          <div id="room-code-badge" class="room-code-badge">房间 ---- · 1/10</div>
+          <h2 id="room-preset-title">本局：经典大乱斗</h2>
+          <p id="room-mechanics">机制：死斗</p>
+          <div class="room-picks" id="room-picks">
+            <button type="button" data-room-pick="0">🪨</button>
+            <button type="button" data-room-pick="1">✂️</button>
+            <button type="button" data-room-pick="2">✋🏻</button>
+          </div>
+          <div id="room-pick-status" class="room-pick-status">请选择本局赢家</div>
+          <div class="room-board-wrap">
+            <h3>排行榜</h3>
+            <div id="room-leaderboard" class="room-leaderboard"></div>
+          </div>
+        </div>
+
+        <div id="room-settle-panel" class="room-panel hidden">
+          <div id="room-settle-emoji" class="room-settle-emoji">🪨</div>
+          <h2 id="room-settle-title">本局结算</h2>
+          <p id="room-settle-detail">下一局即将开始</p>
+          <div id="room-settle-countdown" class="room-kicker">下一局开始：5 秒</div>
+          <div id="room-settle-board" class="room-leaderboard"></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="room-watch-bar" class="room-watch-bar hidden">
+      <span id="room-watch-status">你押了 ✂️</span>
+      <button id="room-rank-toggle" type="button">排行榜</button>
+    </div>
+
+    <aside id="room-rank-panel" class="room-rank-panel hidden" aria-label="竞猜房间排行榜">
+      <strong>排行榜</strong>
+      <div id="room-watch-board" class="room-leaderboard compact"></div>
+    </aside>
   </main>
 
   <script>
@@ -468,6 +547,6 @@
       window.__rpsErrors.push(String(event.reason?.stack || event.reason));
     });
   </script>
-  <script type="module" src="js/game.js?v=0.1.0"></script>
+  <script type="module" src="js/game.js?v=0.2.6"></script>
 </body>
 </html>

@@ -18,6 +18,7 @@ export function drawEntitiesLayer({
   ctx.textBaseline = "middle";
   const now = performance.now();
   for (const entity of state.entities) {
+    if (entity.dead) continue;
     drawEntity({
       ctx,
       state,

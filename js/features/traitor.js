@@ -6,6 +6,7 @@ import {
   TRAITOR_INTERVAL,
   TRAITOR_WARNING_DURATION,
 } from "../config/constants.js";
+import { logEvent } from "../services/battleLog.js?v=0.2.6";
 
 export function createTraitorFeature({
   state,
@@ -122,6 +123,14 @@ export function createTraitorFeature({
     entity.type = targetType !== null && targetType !== oldType
       ? targetType
       : pick([0, 1, 2].filter((type) => type !== oldType));
+    logEvent("event_trigger", {
+      eventName: "叛徒",
+      detail: {
+        entityId: entity.id,
+        fromType: oldType,
+        toType: entity.type,
+      },
+    });
     entity.lastConverted = now;
     entity.scale = 1.78;
     entity.flash = 1;
