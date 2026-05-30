@@ -3,7 +3,7 @@ import {
   MAX_ENTITIES,
   POWER_INFO,
 } from "../config/constants.js";
-import { logEvent } from "../services/battleLog.js?v=0.2.6";
+import { logEvent } from "../services/battleLog.js?v=0.2.7";
 
 export function createPowerUpFeature({
   state,

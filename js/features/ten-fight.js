@@ -6,7 +6,7 @@ import {
   TEN_FIGHT_RATIO,
   TEN_FIGHT_TRIGGER_CHANCE,
 } from "../config/constants.js";
-import { logEvent } from "../services/battleLog.js?v=0.2.6";
+import { logEvent } from "../services/battleLog.js?v=0.2.7";
 
 export function createTenFightFeature({
   state,

@@ -2,7 +2,7 @@ import {
   CONTROL_ZONE_TARGET,
   SHRINK_FINAL_SETTLE,
 } from "../config/constants.js";
-import { logFactionEliminations } from "../services/battleLog.js?v=0.2.6";
+import { logFactionEliminations } from "../services/battleLog.js?v=0.2.7";
 
 export function createRoundRules({
   state,

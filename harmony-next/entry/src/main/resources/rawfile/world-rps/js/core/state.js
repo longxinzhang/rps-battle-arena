@@ -19,6 +19,8 @@ export function createInitialState() {
     animId: 0,
     lastTs: 0,
     roundStart: 0,
+    roundHoldUntil: 0,
+    endOverlayTimer: 0,
     nextPowerAt: 0,
     nextTraitorAt: 0,
     nextBlackHoleAt: 0,

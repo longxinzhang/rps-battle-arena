@@ -6,7 +6,7 @@ import {
   TRAITOR_INTERVAL,
   TRAITOR_WARNING_DURATION,
 } from "../config/constants.js";
-import { logEvent } from "../services/battleLog.js?v=0.2.6";
+import { logEvent } from "../services/battleLog.js?v=0.2.7";
 
 export function createTraitorFeature({
   state,

@@ -7,7 +7,7 @@ import {
   FLEE_STRENGTH,
   FRICTION,
 } from "../config/constants.js";
-import { logEvent } from "../services/battleLog.js?v=0.2.6";
+import { logEvent } from "../services/battleLog.js?v=0.2.7";
 
 export function createCombatSystem({
   state,

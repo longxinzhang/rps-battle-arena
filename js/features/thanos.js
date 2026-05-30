@@ -2,7 +2,7 @@ import {
   SNAP_OVERLAY_DURATION,
   SNAP_REVEAL_DELAY,
 } from "../config/constants.js";
-import { logEvent } from "../services/battleLog.js?v=0.2.6";
+import { logEvent } from "../services/battleLog.js?v=0.2.7";
 
 export function createThanosFeature({
   state,

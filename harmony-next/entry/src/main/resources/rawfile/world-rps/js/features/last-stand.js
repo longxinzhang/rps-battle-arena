@@ -6,7 +6,7 @@ import {
   LAST_STAND_SPLIT_CHANCE,
   MAX_ENTITIES,
 } from "../config/constants.js";
-import { logEvent } from "../services/battleLog.js?v=0.2.6";
+import { logEvent } from "../services/battleLog.js?v=0.2.7";
 
 export function createLastStandFeature({
   state,

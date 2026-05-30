@@ -21,7 +21,8 @@ export function createHudController({
     if (state.options.deathmatch) {
       ui.timer.textContent = "死斗";
     } else if (state.running && !state.roundOver) {
-      const remaining = Math.max(0, state.roundLimit - (performance.now() - state.roundStart));
+      const elapsed = Math.max(0, performance.now() - state.roundStart);
+      const remaining = Math.max(0, Math.min(state.roundLimit, state.roundLimit - elapsed));
       ui.timer.textContent = (remaining / 1000).toFixed(1);
     } else {
       ui.timer.textContent = (state.roundLimit / 1000).toFixed(1);

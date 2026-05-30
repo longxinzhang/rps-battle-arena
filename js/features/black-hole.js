@@ -6,7 +6,7 @@ import {
   BLACK_HOLE_MAX_RADIUS,
   BLACK_HOLE_PULL_RADIUS,
 } from "../config/constants.js";
-import { logEvent } from "../services/battleLog.js?v=0.2.6";
+import { logEvent } from "../services/battleLog.js?v=0.2.7";
 
 export function createBlackHoleFeature({
   state,

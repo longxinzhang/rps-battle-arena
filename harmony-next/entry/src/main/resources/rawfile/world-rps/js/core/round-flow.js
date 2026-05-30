@@ -1,9 +1,13 @@
-import { TRAITOR_FIRST_DELAY } from "../config/constants.js";
+import {
+  GAME_END_LAYOUT_HOLD_MS,
+  GAME_START_LAYOUT_HOLD_MS,
+  TRAITOR_FIRST_DELAY,
+} from "../config/constants.js";
 import {
   getLog,
   logEvent,
   resetBattleLog,
-} from "../services/battleLog.js?v=0.2.6";
+} from "../services/battleLog.js?v=0.2.7";
 
 export function createRoundFlow({
   state,
@@ -93,18 +97,22 @@ export function createRoundFlow({
   function startRound() {
     const tenFight = getTenFightControls();
     const now = performance.now();
+    const startAt = now + GAME_START_LAYOUT_HOLD_MS;
+    clearTimeout(state.endOverlayTimer);
+    state.endOverlayTimer = 0;
     state.running = true;
     state.paused = false;
     state.roundOver = false;
     state.suddenDeath = false;
     state.lastTs = 0;
-    state.roundStart = now;
-    state.nextPowerAt = now + rand(2600, 4300);
-    state.nextTraitorAt = now + TRAITOR_FIRST_DELAY;
-    state.nextBlackHoleAt = now + rand(13500, 18500);
+    state.roundStart = startAt;
+    state.roundHoldUntil = startAt;
+    state.nextPowerAt = startAt + rand(2600, 4300);
+    state.nextTraitorAt = startAt + TRAITOR_FIRST_DELAY;
+    state.nextBlackHoleAt = startAt + rand(13500, 18500);
     state.traitorEarlyUsed = false;
-    resetThanosEvent(now);
-    tenFight.resetTenFightEvent?.(now);
+    resetThanosEvent(startAt);
+    tenFight.resetTenFightEvent?.(startAt);
     resetControlZones();
     resetBountyState();
     state.powerUps = [];
@@ -113,7 +121,7 @@ export function createRoundFlow({
     state.particles = [];
     state.arena.padding = 0;
     state.arena.targetPadding = 0;
-    state.arena.lastShrink = now;
+    state.arena.lastShrink = startAt;
     state.arena.finalAt = 0;
     state.arena.finalStarted = false;
     ui.pauseToggle.textContent = "暂停";
@@ -142,6 +150,7 @@ export function createRoundFlow({
     });
     resetLastStandState();
     updateHud();
+    draw();
     cancelAnimationFrame(state.animId);
     state.animId = requestAnimationFrame(loop);
   }
@@ -151,6 +160,9 @@ export function createRoundFlow({
     state.running = false;
     state.roundOver = true;
     cancelAnimationFrame(state.animId);
+    clearTimeout(state.endOverlayTimer);
+    state.endOverlayTimer = 0;
+    state.roundHoldUntil = 0;
     clearCountdownTimers();
     ui.resultScreen.classList.add("hidden");
     ui.betScreen.classList.add("hidden");
@@ -177,6 +189,7 @@ export function createRoundFlow({
     } else {
       tenFight.hideTenFightUi?.();
     }
+    state.roundHoldUntil = 0;
 
     const counts = countEntities();
     let settlement = "本局没有结算";
@@ -207,59 +220,64 @@ export function createRoundFlow({
       ? state.wins.findIndex((wins) => wins >= maxWins)
       : -1;
     const isMatchDone = state.options.tournament && matchWinner !== -1;
-    if (winnerType !== null && winnerType !== undefined) {
-      if (!state.options.tournament || isMatchDone) {
-        audio.finalWin(winnerType);
-      } else {
-        audio.win(winnerType);
-      }
-    }
 
-    onGameEnd({
+    const endPayload = {
       winnerType,
       reason,
       duration,
       counts,
       log: getLog(),
-    });
-    if (state.bettingRoom?.active) {
-      return;
-    }
-
-    ui.winnerEmoji.textContent = winnerType === null ? "·" : typeInfo[winnerType].emoji;
-    ui.winnerText.textContent = winnerType === null
-      ? "本局平局"
-      : `${typeInfo[winnerType].label}胜利`;
-
-    const reasonText = roundReasonText(reason);
-    const matchText = state.options.tournament
-      ? isMatchDone
-        ? `赛点结束：${typeInfo[matchWinner].label}拿下整场`
-        : `胜场 ${formatWins()}，${reasonText}`
-      : reasonText;
-
-    ui.winnerSubtext.textContent = `${matchText}。${settlement}`;
-    ui.nextRoundBtn.textContent = isMatchDone
-      ? "新赛制"
-      : state.options.tournament
-        ? "下一局"
-        : "再来一局";
-    if (isMatchDone) {
-      ui.nextBetPanel.classList.add("hidden");
-    } else if (state.options.betting) {
-      prepareNextBetPanel();
-    } else {
-      ui.nextBetPanel.classList.add("hidden");
-    }
-    ui.nextRoundBtn.onclick = isMatchDone ? showStartScreen : () => {
-      applyNextBet();
-      if (state.options.tournament) {
-        state.roundIndex += 1;
-      }
-      ui.resultScreen.classList.add("hidden");
-      showBetIntro();
     };
-    ui.resultScreen.classList.remove("hidden");
+    draw();
+    state.endOverlayTimer = window.setTimeout(() => {
+      state.endOverlayTimer = 0;
+      if (winnerType !== null && winnerType !== undefined) {
+        if (!state.options.tournament || isMatchDone) {
+          audio.finalWin(winnerType);
+        } else {
+          audio.win(winnerType);
+        }
+      }
+      onGameEnd(endPayload);
+      if (state.bettingRoom?.active) {
+        return;
+      }
+
+      ui.winnerEmoji.textContent = winnerType === null ? "·" : typeInfo[winnerType].emoji;
+      ui.winnerText.textContent = winnerType === null
+        ? "本局平局"
+        : `${typeInfo[winnerType].label}胜利`;
+
+      const reasonText = roundReasonText(reason);
+      const matchText = state.options.tournament
+        ? isMatchDone
+          ? `赛点结束：${typeInfo[matchWinner].label}拿下整场`
+          : `胜场 ${formatWins()}，${reasonText}`
+        : reasonText;
+
+      ui.winnerSubtext.textContent = `${matchText}。${settlement}`;
+      ui.nextRoundBtn.textContent = isMatchDone
+        ? "新赛制"
+        : state.options.tournament
+          ? "下一局"
+          : "再来一局";
+      if (isMatchDone) {
+        ui.nextBetPanel.classList.add("hidden");
+      } else if (state.options.betting) {
+        prepareNextBetPanel();
+      } else {
+        ui.nextBetPanel.classList.add("hidden");
+      }
+      ui.nextRoundBtn.onclick = isMatchDone ? showStartScreen : () => {
+        applyNextBet();
+        if (state.options.tournament) {
+          state.roundIndex += 1;
+        }
+        ui.resultScreen.classList.add("hidden");
+        showBetIntro();
+      };
+      ui.resultScreen.classList.remove("hidden");
+    }, GAME_END_LAYOUT_HOLD_MS);
   }
 
   function roundReasonText(reason) {

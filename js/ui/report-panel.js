@@ -1,4 +1,4 @@
-import { generateReport } from "../features/battle-report.js?v=0.2.6";
+import { generateReport } from "../features/battle-report.js?v=0.2.7";
 
 const TYPE_META = [
   { emoji: "🪨", label: "石头", color: "#6B7280" },

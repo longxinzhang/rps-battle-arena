@@ -3,9 +3,9 @@ import {
   ROOM_STAGE_COUNT,
   ROOM_STATE_POLL_MS,
 } from "../config/constants.js";
-import { createRoomApi } from "../services/room-api.js?v=0.2.6";
-import { createRoomSnapshotTools } from "../services/room-snapshot.js?v=0.2.6";
-import { createBettingUI } from "../ui/betting-ui.js?v=0.2.6";
+import { createRoomApi } from "../services/room-api.js?v=0.2.7";
+import { createRoomSnapshotTools } from "../services/room-snapshot.js?v=0.2.7";
+import { createBettingUI } from "../ui/betting-ui.js?v=0.2.7";
 
 const PLAYERS_KEY = "wrps_betting_players";
 const ROUND_KEY = "wrps_betting_round";

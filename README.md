@@ -1,6 +1,6 @@
 # World of RPS
 
-当前开发版本：`0.2.6`。
+当前开发版本：`0.2.7`。
 
 从原始 `rps_battle.html` 扩展出来的可继续做大的版本。原版保存在 `legacy/rps_battle_original.html`。
 

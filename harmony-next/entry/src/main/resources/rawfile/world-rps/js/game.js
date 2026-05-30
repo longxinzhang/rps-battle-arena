@@ -16,13 +16,13 @@ import { createAudioService } from "./services/audio.js";
 import {
   configureBattleLog,
   getLog,
-} from "./services/battleLog.js?v=0.2.6";
-import { getDomElements } from "./ui/dom.js?v=0.2.6";
+} from "./services/battleLog.js?v=0.2.7";
+import { getDomElements } from "./ui/dom.js?v=0.2.7";
 import { createHudController } from "./ui/hud.js";
 import { createEventFeed } from "./ui/event-feed.js";
 import { createSetupController } from "./ui/setup-controller.js";
-import { createReportPanel } from "./ui/report-panel.js?v=0.2.6";
-import { createBettingRoom } from "./features/betting-room.js?v=0.2.6";
+import { createReportPanel } from "./ui/report-panel.js?v=0.2.7";
+import { createBettingRoom } from "./features/betting-room.js?v=0.2.7";
 import { bindPointerControls } from "./ui/pointer-controls.js";
 import { bindInputControls } from "./ui/input-bindings.js";
 import { createCanvasRenderer } from "./render/canvas.js";
