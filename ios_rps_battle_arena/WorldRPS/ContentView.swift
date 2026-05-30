@@ -4,7 +4,7 @@ import WebKit
 struct ContentView: View {
     var body: some View {
         WorldRPSWebView()
-            .ignoresSafeArea()
+            .ignoresSafeArea(.container, edges: .bottom)
             .background(Color.black)
     }
 }
@@ -48,4 +48,3 @@ private struct WorldRPSWebView: UIViewRepresentable {
         }
     }
 }
-
