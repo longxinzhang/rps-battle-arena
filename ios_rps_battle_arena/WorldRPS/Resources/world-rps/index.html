@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>World of RPS</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main id="app">
+    <canvas id="game" aria-label="World of RPS"></canvas>
+
+    <section id="hud" class="hud" aria-live="polite">
+      <div class="round-panel">
+        <div class="round-stat">
+          <span>局</span>
+          <strong><b id="round-index">1</b>/<b id="round-total">3</b></strong>
+        </div>
+        <div class="round-stat">
+          <span>胜场</span>
+          <strong id="match-score">0 · 0 · 0</strong>
+        </div>
+        <div class="round-stat">
+          <span>时间</span>
+          <strong id="timer">60.0</strong>
+        </div>
+        <div class="round-stat">
+          <span>积分</span>
+          <strong id="bank">1000</strong>
+        </div>
+      </div>
+
+      <div class="scoreboard">
+        <div class="score-pill rock">
+          <span class="score-emoji" data-type-emoji="0">🪨</span>
+          <strong id="s-rock">0</strong>
+        </div>
+        <div class="score-pill scissors">
+          <span class="score-emoji" data-type-emoji="1">✂️</span>
+          <strong id="s-scissors">0</strong>
+        </div>
+        <div class="score-pill paper">
+          <span class="score-emoji" data-type-emoji="2">✋🏻</span>
+          <strong id="s-paper">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <aside id="event-feed" class="event-feed" aria-live="polite"></aside>
+
+    <div id="ten-fight-bar" class="ten-fight-bar hidden" aria-live="polite">
+      <span id="ten-fight-bar-fill"></span>
+      <strong id="ten-fight-time">暴走 10.0s</strong>
+    </div>
+
+    <nav class="tool-dock" aria-label="控制">
+      <button class="tool-btn field-tool active hidden" id="push-tool" type="button" data-field-mode="push" title="推开附近单位">↗</button>
+      <button class="tool-btn field-tool hidden" id="pull-tool" type="button" data-field-mode="pull" title="吸引附近单位">↙</button>
+      <button class="tool-btn" id="sound-toggle" type="button" title="音效开关">🔊</button>
+      <button class="tool-btn" id="settings-toggle" type="button" title="游戏设置">⚙</button>
+      <button class="tool-btn wide" id="god-hand-toggle" type="button">上帝之手</button>
+      <button class="tool-btn wide hidden" id="home-btn" type="button">回首页</button>
+      <button class="tool-btn wide" id="pause-toggle" type="button">暂停</button>
+    </nav>
+
+    <section id="settings-panel" class="settings-panel hidden" aria-label="游戏设置">
+      <div class="settings-head">
+        <strong>游戏设置</strong>
+        <button id="settings-close" class="settings-close" type="button" title="关闭">×</button>
+      </div>
+      <label class="range-row">
+        <span>BGM <strong data-volume-value="bgm">45%</strong></span>
+        <input id="live-bgm-volume" type="range" min="0" max="100" value="45" step="1">
+      </label>
+      <label class="range-row">
+        <span>音效 <strong data-volume-value="sfx">80%</strong></span>
+        <input id="live-sfx-volume" type="range" min="0" max="100" value="80" step="1">
+      </label>
+      <label class="switch-row settings-switch">
+        <span>
+          游戏通知
+          <small>控制游戏进行中的弹出消息。</small>
+        </span>
+        <input id="live-notifications" type="checkbox" checked>
+      </label>
+    </section>
+
+    <section id="start-screen" class="screen">
+      <div class="setup-modal">
+        <div class="brand-row">
+          <img class="brand-mark" id="brand-mark" src="assets/logo.png" alt="World of RPS">
+          <div>
+            <h1>World of RPS</h1>
+            <p id="brand-subtitle">石头剪刀布 · 物理碰撞吞并战</p>
+          </div>
+        </div>
+
+        <section class="preset-panel" aria-label="游戏预设">
+          <div class="preset-head">
+            <strong>
+              <span class="preset-title-desktop">游戏预设</span>
+              <span class="preset-title-mobile">经典战役</span>
+            </strong>
+            <span>一键套用经典玩法</span>
+          </div>
+          <div class="preset-grid">
+            <button type="button" data-preset="classic">
+              <strong>经典大乱斗</strong>
+              <span>死斗清场</span>
+            </button>
+            <button type="button" data-preset="zones">
+              <strong>团队占点</strong>
+              <span>据点 · 黑洞 · 绝地</span>
+            </button>
+            <button type="button" data-preset="traitor">
+              <strong>小心叛徒</strong>
+              <span>缩圈 · 黑洞 · 叛徒</span>
+            </button>
+            <button type="button" data-preset="equality">
+              <strong>众生平等</strong>
+              <span>响指 · 障碍 · 死斗</span>
+            </button>
+          </div>
+        </section>
+
+        <div class="setup-grid">
+          <fieldset class="setup-group" data-setup-group="lineup">
+            <legend>
+              <button class="setup-toggle" type="button" aria-expanded="false">
+                <span>初始阵容</span>
+                <small data-setup-summary="lineup">RPS · 10/10/10 · 60秒</small>
+              </button>
+            </legend>
+            <p class="setup-help">基础玩法默认开启：三方自动追捕天敌链，碰撞后弱势方会被转化。</p>
+            <div class="theme-row" aria-label="阵营主题">
+              <button type="button" class="active" data-theme="rps">RPS</button>
+              <button type="button" data-theme="colors">颜色球</button>
+              <button type="button" data-theme="countries">国家队</button>
+              <button type="button" data-theme="brands">品牌战</button>
+            </div>
+            <p class="setup-help theme-help">只替换阵营身份与配色，克制链和物理玩法保持一致。</p>
+            <label class="text-row custom-name-row hidden">
+              <span><span data-type-emoji="0">🪨</span> 名称</span>
+              <input id="cfg-name-0" type="text" value="石头" maxlength="12">
+            </label>
+            <label class="text-row custom-name-row hidden">
+              <span><span data-type-emoji="1">✂️</span> 名称</span>
+              <input id="cfg-name-1" type="text" value="剪刀" maxlength="12">
+            </label>
+            <label class="text-row custom-name-row hidden">
+              <span><span data-type-emoji="2">✋🏻</span> 名称</span>
+              <input id="cfg-name-2" type="text" value="布" maxlength="12">
+            </label>
+            <label class="switch-row count-sync-row">
+              <span>
+                人数同步
+                <small>开启后调整任意一方，三方人数一起变化。</small>
+              </span>
+              <input id="cfg-sync-counts" type="checkbox" checked>
+            </label>
+            <label class="number-row">
+              <span><span data-type-emoji="0">🪨</span> <span data-type-label="0">石头</span></span>
+              <div class="count-stepper">
+                <button type="button" data-count-step="-1" data-count-target="cfg-rock" aria-label="减少石头人数">-</button>
+                <input id="cfg-rock" type="number" value="10" min="3" max="60">
+                <button type="button" data-count-step="1" data-count-target="cfg-rock" aria-label="增加石头人数">+</button>
+              </div>
+            </label>
+            <label class="number-row">
+              <span><span data-type-emoji="1">✂️</span> <span data-type-label="1">剪刀</span></span>
+              <div class="count-stepper">
+                <button type="button" data-count-step="-1" data-count-target="cfg-scissors" aria-label="减少剪刀人数">-</button>
+                <input id="cfg-scissors" type="number" value="10" min="3" max="60">
+                <button type="button" data-count-step="1" data-count-target="cfg-scissors" aria-label="增加剪刀人数">+</button>
+              </div>
+            </label>
+            <label class="number-row">
+              <span><span data-type-emoji="2">✋🏻</span> <span data-type-label="2">布</span></span>
+              <div class="count-stepper">
+                <button type="button" data-count-step="-1" data-count-target="cfg-paper" aria-label="减少布人数">-</button>
+                <input id="cfg-paper" type="number" value="10" min="3" max="60">
+                <button type="button" data-count-step="1" data-count-target="cfg-paper" aria-label="增加布人数">+</button>
+              </div>
+            </label>
+            <label class="number-row">
+              <span>单局秒数</span>
+              <input id="cfg-duration" type="number" value="60" min="10" max="300" step="5">
+            </label>
+          </fieldset>
+
+          <fieldset class="setup-group" data-setup-group="settings">
+            <legend>
+              <button class="setup-toggle" type="button" aria-expanded="false">
+                <span>游戏设置</span>
+                <small data-setup-summary="settings">BGM 45% · 音效 80%</small>
+              </button>
+            </legend>
+            <label class="range-row">
+              <span>BGM <strong data-volume-value="bgm">45%</strong></span>
+              <input id="cfg-bgm-volume" type="range" min="0" max="100" value="45" step="1">
+            </label>
+            <label class="range-row">
+              <span>音效 <strong data-volume-value="sfx">80%</strong></span>
+              <input id="cfg-sfx-volume" type="range" min="0" max="100" value="80" step="1">
+            </label>
+            <label class="switch-row">
+              <span>
+                游戏通知
+                <small>关闭后，游戏进行中不展示弹出消息。</small>
+              </span>
+              <input id="cfg-notifications" type="checkbox" checked>
+            </label>
+          </fieldset>
+
+          <fieldset class="setup-group" data-setup-group="mechanics">
+            <legend>
+              <button class="setup-toggle" type="button" aria-expanded="false">
+                <span>机制</span>
+                <small data-setup-summary="mechanics">默认</small>
+              </button>
+            </legend>
+            <label class="switch-row">
+              <span>
+                上帝之手
+                <small>开启后用鼠标或手指推开/吸引附近单位。</small>
+              </span>
+              <input id="opt-god-hand" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                地形障碍
+                <small>场地生成墙和柱子，单位碰到会弹开。</small>
+              </span>
+              <input id="opt-obstacles" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                缩圈
+                <small>边界会逐步内收，把单位推向决战区。</small>
+              </span>
+              <input id="opt-shrink" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                悬赏头名
+                <small>一家明显领先时，另外两家会追猎头名并获得反打奖励。</small>
+              </span>
+              <input id="opt-bounty" type="checkbox">
+            </label>
+          </fieldset>
+
+          <fieldset class="setup-group" data-setup-group="events">
+            <legend>
+              <button class="setup-toggle" type="button" aria-expanded="false">
+                <span>精彩事件</span>
+                <small data-setup-summary="events">默认</small>
+              </button>
+            </legend>
+            <label class="switch-row">
+              <span>
+                我们中出了个叛徒
+                <small>10-15 秒会提前救场；常规每轮随机 1-2 个阵营出叛徒。</small>
+              </span>
+              <input id="opt-traitor" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                黑洞
+                <small>随机刷新黑洞，吞掉单位后体积和吸附范围都会成长。</small>
+              </span>
+              <input id="opt-black-hole" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                能量道具
+                <small>刷新加速、护盾、分裂球；团队版会让同派全员获得。</small>
+              </span>
+              <input id="opt-powerups" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                我要打十个
+                <small>两方悬殊且少数方被克制时，有概率进入 10 秒暴走反杀。</small>
+              </span>
+              <input id="opt-ten-fight" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                绝地求生
+                <small>只剩 1 个时大概率分裂；被团灭时小概率 5 秒后原地复活。</small>
+              </span>
+              <input id="opt-last-stand" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                灭霸响指
+                <small>随机华丽登场，响指后每个派系消失一半。</small>
+              </span>
+              <input id="opt-thanos" type="checkbox">
+            </label>
+          </fieldset>
+
+          <fieldset class="setup-group" data-setup-group="format">
+            <legend>
+              <button class="setup-toggle" type="button" aria-expanded="false">
+                <span>赛制</span>
+                <small data-setup-summary="format">单局</small>
+              </button>
+            </legend>
+            <label class="switch-row">
+              <span>
+                多局赛制
+                <small>开启后打三局两胜或五局三胜，胜方下局削弱。</small>
+              </span>
+              <input id="opt-tournament" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                死斗模式
+                <small>无视倒计时，直到一方完全霸屏才结束。</small>
+              </span>
+              <input id="opt-deathmatch" type="checkbox">
+            </label>
+            <label class="switch-row">
+              <span>
+                据点争夺
+                <small>场上出现 3 个占领区，先拿到目标分也能获胜。</small>
+              </span>
+              <input id="opt-zones" type="checkbox">
+            </label>
+            <div class="option-controls disabled" id="tournament-controls">
+              <div class="segmented" id="match-length">
+                <button type="button" class="active" data-best-of="3">三局两胜</button>
+                <button type="button" data-best-of="5">五局三胜</button>
+              </div>
+              <label class="number-row">
+                <span>胜方削弱</span>
+                <input id="cfg-penalty" type="number" value="5" min="0" max="20">
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="setup-group" data-setup-group="betting">
+            <legend>
+              <button class="setup-toggle" type="button" aria-expanded="false">
+                <span>竞猜积分</span>
+                <small data-setup-summary="betting">未开</small>
+              </button>
+            </legend>
+            <label class="switch-row">
+              <span>
+                下注模式
+                <small>开局先选择支持选手，3·2·1 倒计时后开战。</small>
+              </span>
+              <input id="opt-betting" type="checkbox">
+            </label>
+            <div class="option-controls disabled" id="betting-controls">
+              <div class="bet-buttons" id="bet-buttons">
+              <button type="button" class="bet-card active" data-pick="0">
+                <span data-type-emoji="0">🪨</span>
+                <strong id="odds-rock">x2.00</strong>
+              </button>
+              <button type="button" class="bet-card" data-pick="1">
+                <span data-type-emoji="1">✂️</span>
+                <strong id="odds-scissors">x2.00</strong>
+              </button>
+              <button type="button" class="bet-card" data-pick="2">
+                <span data-type-emoji="2">✋🏻</span>
+                <strong id="odds-paper">x2.00</strong>
+              </button>
+              </div>
+              <label class="number-row">
+                <span>押注</span>
+                <input id="cfg-stake" type="number" value="100" min="0" max="1000" step="25">
+              </label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="setup-actions">
+          <button id="start-btn" class="primary-btn" type="button">开始乱斗</button>
+          <button id="room-btn" class="secondary-btn" type="button" hidden>竞猜房间</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="bet-screen" class="screen hidden">
+      <div class="bet-modal">
+        <h2>石头剪刀布大作战</h2>
+        <p>请选择你支持的选手</p>
+        <div class="intro-picks">
+          <button type="button" class="intro-pick active" data-intro-pick="0">
+            <span data-type-emoji="0">🪨</span>
+            <strong data-type-label="0">石头</strong>
+          </button>
+          <button type="button" class="intro-pick" data-intro-pick="1">
+            <span data-type-emoji="1">✂️</span>
+            <strong data-type-label="1">剪刀</strong>
+          </button>
+          <button type="button" class="intro-pick" data-intro-pick="2">
+            <span data-type-emoji="2">✋🏻</span>
+            <strong data-type-label="2">布</strong>
+          </button>
+        </div>
+        <div id="intro-summary" class="intro-summary" aria-label="本局设置"></div>
+        <div id="bet-countdown" class="bet-countdown">3</div>
+        <button id="intro-skip-btn" class="secondary-btn intro-skip-btn" type="button">直接开始</button>
+      </div>
+    </section>
+
+    <section id="thanos-screen" class="thanos-screen hidden" aria-live="assertive">
+      <div class="thanos-card">
+        <img src="assets/thanos.png" alt="灭霸响指">
+        <div class="thanos-copy">
+          <strong>灭霸响指</strong>
+          <span>所有派系消失一半</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="ten-fight-screen" class="ten-fight-screen hidden" aria-live="assertive">
+      <div class="ten-fight-copy">
+        <strong id="ten-fight-title">触发了「我要打十个」！</strong>
+        <span id="ten-fight-subtext">10 秒反杀窗口开启</span>
+      </div>
+    </section>
+
+    <section id="result-screen" class="screen hidden">
+      <div class="result-modal">
+        <div id="winner-emoji" class="winner-emoji">🪨</div>
+        <h2 id="winner-text">石头胜利</h2>
+        <p id="winner-subtext">本局结算</p>
+        <div id="next-bet-panel" class="next-bet-panel hidden">
+          <div class="mini-title">下一局竞猜</div>
+          <div class="bet-buttons compact" id="next-bet-buttons">
+            <button type="button" class="bet-card active" data-pick="0">
+              <span data-type-emoji="0">🪨</span>
+              <strong id="next-odds-rock">x2.00</strong>
+            </button>
+            <button type="button" class="bet-card" data-pick="1">
+              <span data-type-emoji="1">✂️</span>
+              <strong id="next-odds-scissors">x2.00</strong>
+            </button>
+            <button type="button" class="bet-card" data-pick="2">
+              <span data-type-emoji="2">✋🏻</span>
+              <strong id="next-odds-paper">x2.00</strong>
+            </button>
+          </div>
+          <label class="number-row next-stake-row">
+            <span>押注</span>
+            <input id="next-stake" type="number" value="100" min="0" max="1000" step="25">
+          </label>
+        </div>
+        <div class="result-actions">
+          <button id="report-btn" class="secondary-btn" type="button">查看战报</button>
+          <button id="next-round-btn" class="primary-btn" type="button">下一局</button>
+          <button id="restart-btn" class="secondary-btn" type="button">重新开赛</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="report-screen" class="report-screen hidden" aria-label="赛后战报">
+      <div class="report-card">
+        <button id="report-close" class="report-close" type="button" title="关闭">×</button>
+        <div class="report-head">
+          <span>赛后战报</span>
+          <strong>Battle Report</strong>
+        </div>
+        <section class="report-section">
+          <h2>战局叙述</h2>
+          <div id="report-text" class="report-text"></div>
+        </section>
+        <section class="report-section">
+          <h2>人数变化</h2>
+          <canvas id="report-chart" class="report-chart" aria-label="人数变化曲线"></canvas>
+        </section>
+        <section class="report-section">
+          <h2>MVP 统计</h2>
+          <div id="report-mvp" class="report-mvp"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="room-screen" class="room-screen hidden" aria-label="竞猜房间">
+      <div class="room-card">
+        <button id="room-exit" class="room-close" type="button" title="退出">×</button>
+        <div id="room-name-panel" class="room-panel">
+          <div class="room-kicker">竞猜房间</div>
+          <h2>输入昵称进入房间</h2>
+          <p id="room-status" class="room-status">留空房间号会自动创建；输入房间号可加入朋友的房间。</p>
+          <label class="room-name-row">
+            <span>昵称</span>
+            <input id="room-name-input" type="text" maxlength="8" autocomplete="off" placeholder="最多 8 个字">
+          </label>
+          <label class="room-name-row">
+            <span>房间号码</span>
+            <input id="room-code-input" type="text" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="留空自动创建">
+          </label>
+          <button id="room-name-confirm" class="primary-btn" type="button">进入房间</button>
+        </div>
+
+        <div id="room-betting-panel" class="room-panel hidden">
+          <div class="room-kicker" id="room-countdown">下注时间：10 秒</div>
+          <div id="room-code-badge" class="room-code-badge">房间 ---- · 1/10</div>
+          <h2 id="room-preset-title">本局：经典大乱斗</h2>
+          <p id="room-mechanics">机制：死斗</p>
+          <div class="room-picks" id="room-picks">
+            <button type="button" data-room-pick="0">🪨</button>
+            <button type="button" data-room-pick="1">✂️</button>
+            <button type="button" data-room-pick="2">✋🏻</button>
+          </div>
+          <div id="room-pick-status" class="room-pick-status">请选择本局赢家</div>
+          <div class="room-board-wrap">
+            <h3>排行榜</h3>
+            <div id="room-leaderboard" class="room-leaderboard"></div>
+          </div>
+        </div>
+
+        <div id="room-settle-panel" class="room-panel hidden">
+          <div id="room-settle-emoji" class="room-settle-emoji">🪨</div>
+          <h2 id="room-settle-title">本局结算</h2>
+          <p id="room-settle-detail">下一局即将开始</p>
+          <div id="room-settle-countdown" class="room-kicker">下一局开始：5 秒</div>
+          <div id="room-settle-board" class="room-leaderboard"></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="room-watch-bar" class="room-watch-bar hidden">
+      <span id="room-watch-status">你押了 ✂️</span>
+      <button id="room-rank-toggle" type="button">排行榜</button>
+    </div>
+
+    <aside id="room-rank-panel" class="room-rank-panel hidden" aria-label="竞猜房间排行榜">
+      <strong>排行榜</strong>
+      <div id="room-watch-board" class="room-leaderboard compact"></div>
+    </aside>
+  </main>
+
+  <script>
+    window.__rpsErrors = [];
+    window.addEventListener("error", (event) => {
+      window.__rpsErrors.push(`${event.message} @ ${event.filename}:${event.lineno}`);
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+      window.__rpsErrors.push(String(event.reason?.stack || event.reason));
+    });
+  </script>
+  <script type="module" src="js/game.js?v=0.2.7"></script>
+</body>
+</html>
