@@ -9,6 +9,5 @@ HVIGORW="${HVIGORW:-$DEVECO_APP/Contents/tools/hvigor/bin/hvigorw}"
 export DEVECO_SDK_HOME="${DEVECO_SDK_HOME:-$DEVECO_APP/Contents/sdk}"
 export JAVA_HOME="${JAVA_HOME:-$DEVECO_APP/Contents/jbr/Contents/Home}"
 
-echo "harmony-next is a frozen WebView archive; Web assets are not synchronized."
 cd "$PROJECT_DIR"
 "$HVIGORW" assembleApp --node-home "$NODE_HOME" --no-daemon "$@"

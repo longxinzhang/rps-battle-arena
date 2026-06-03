@@ -26,13 +26,16 @@ python3 -m http.server 5173
 
 ## HarmonyOS NEXT
 
-鸿蒙 NEXT 工程位于 `harmony-next/`，可用 DevEco Studio 打开并运行到手机、平板或模拟器。当前版本使用 ArkTS + ArkUI 创建应用壳，通过 ArkWeb 加载内置在 rawfile 中的本地游戏资源。
+鸿蒙 NEXT 主线工程位于 `harmony_native/`，后续只维护原生 ArkTS + ArkUI Canvas 版本。
 
-Web 版改动后，同步到鸿蒙工程：
+用 DevEco Studio 打开 `harmony_native/`，配置签名后运行到手机、平板或模拟器。命令行构建：
 
 ```bash
-node harmony-next/scripts/sync-web-assets.mjs
+cd harmony_native
+./scripts/build-app.sh --stacktrace
 ```
+
+`harmony-next/` 是旧 ArkWeb/WebView 包装版，已冻结归档。后续不再同步 Web 资源，也不再修 WebView 版功能。
 
 ## 玩法开关
 

@@ -99,10 +99,11 @@ World of RPS
 ## 平台移植规范
 
 - 平台工程放在独立目录，避免改动 Web 主入口时破坏线上静态部署。
-- `harmony-next/` 只负责 HarmonyOS NEXT 工程壳、资源声明、ArkTS 入口和打包说明。
-- HarmonyOS 内置网页资源放在 `entry/src/main/resources/rawfile/world-rps/`，通过同步脚本从主项目复制，禁止手动长期分叉维护。
-- 平台适配层只做加载、窗口、生命周期、权限和原生能力桥接；游戏规则仍由主项目模块负责。
-- 每次 Web 玩法变更后都要运行 `node harmony-next/scripts/sync-web-assets.mjs`，再用 DevEco Studio 编译验证。
+- HarmonyOS NEXT 只维护 `harmony_native/` 原生 ArkTS + ArkUI Canvas 版本。
+- `harmony-next/` 是旧 ArkWeb/WebView 包装版，已冻结归档；不再同步 Web 资源，不再承接新功能和问题修复。
+- 鸿蒙新增玩法必须落在 `harmony_native/entry/src/main/ets` 的模型、渲染、组件或服务模块中，不能通过 WebView 资源同步完成。
+- 平台适配层只做窗口、生命周期、权限、音频和原生能力桥接；游戏规则优先沉到可测试的模型模块。
+- Web 版与鸿蒙原生版可以阶段性存在功能差异；需要移植时按玩法模块逐项重写，不复制 Web 代码进 `harmony-next`。
 
 ## 模块职责和行数预算
 

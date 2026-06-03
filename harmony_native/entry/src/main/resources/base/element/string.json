@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "World of RPS Native"
+    },
+    {
+      "name": "module_desc",
+      "value": "World of RPS native game module"
+    },
+    {
+      "name": "entry_desc",
+      "value": "World of RPS native game entry"
+    }
+  ]
+}
