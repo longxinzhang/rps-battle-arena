@@ -16,6 +16,11 @@ struct Index {
         .height('100%')
         .javaScriptAccess(true)
         .domStorageAccess(true)
+        .fileAccess(true)
+        .mediaOptions({
+          resumeInterval: 60,
+          audioExclusive: false
+        })
         .onPageEnd(() => {
           this.loading = false;
         })

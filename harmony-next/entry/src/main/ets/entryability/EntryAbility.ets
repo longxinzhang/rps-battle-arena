@@ -16,9 +16,15 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     try {
       const mainWindow = windowStage.getMainWindowSync();
-      mainWindow.setWindowLayoutFullScreen(true);
+      mainWindow.setWindowLayoutFullScreen(false);
+      mainWindow.setWindowSystemBarProperties({
+        statusBarColor: '#F1F4F1',
+        statusBarContentColor: '#111917',
+        navigationBarColor: '#F1F4F1',
+        navigationBarContentColor: '#111917'
+      });
     } catch (error) {
-      hilog.warn(DOMAIN, 'WorldOfRPS', 'Failed to enable fullscreen: %{public}s', JSON.stringify(error));
+      hilog.warn(DOMAIN, 'WorldOfRPS', 'Failed to configure window safe area: %{public}s', JSON.stringify(error));
     }
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
